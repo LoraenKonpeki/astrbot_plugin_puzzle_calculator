@@ -12,11 +12,13 @@ class MyPlugin(Star):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
 
     @filter.command("flag", alias={"semaphore"})
-    async def helloworld(self, event: AstrMessageEvent, flags: list):
+    async def helloworld(self, event: AstrMessageEvent, flags_str: str):
         """旗语解码"""
         message_str = event.message_str  # 用户发的纯文本消息字符串
         message_chain = event.get_messages()
         logger.info(message_chain)
+
+        flags = [flags_str[i:i+2] for i in range(0, len(flag_str), 2)]
         if flags == []:
             yield event.plain_result("请输入待解码旗语！")
         elif not all(len(flag) == 2 for flag in flags):
