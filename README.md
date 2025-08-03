@@ -1,9 +1,3 @@
-# helloworld
+# 在AstrBot上完成简单的古典密码解密和加密功能
 
-AstrBot 插件模板
 
-A template plugin for AstrBot plugin feature
-
-# 支持
-
-[帮助文档](https://astrbot.app)
