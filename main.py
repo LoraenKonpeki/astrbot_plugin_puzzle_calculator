@@ -10,15 +10,27 @@ class MyPlugin(Star):
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
+    @filter.command("flaghelp", alias={"semaphorehelp"})
+    async def flag_help(self, event: AstrMessageEvent):
+        """旗语解码帮助"""
+        message_chain = event.get_messages()
+        logger.info(message_chain)
+        help_message = """
+        旗语解码帮助:
+        旗语是由两个方向的旗帜组成的，每个旗帜由两个数字表示，分别代表旗帜的方向。数字对应方向参考电脑小键盘。（例如：2↓ 4← 8↑ 9↗）
+        解码时为了输入速度及方便，直接将所有两个一组的旗语拼起来输入。例如 "/flag 62797281"。
+        一个旗语里两个方向没有顺序，28和82表示同一个旗语。
+        """
+        yield event.plain_result(help_message)
 
     @filter.command("flag", alias={"semaphore"})
-    async def helloworld(self, event: AstrMessageEvent, flags_str: str):
+    async def flag_decode(self, event: AstrMessageEvent, flags_str: str):
         """旗语解码"""
         message_str = event.message_str  # 用户发的纯文本消息字符串
         message_chain = event.get_messages()
         logger.info(message_chain)
 
-        flags = [flags_str[i:i+2] for i in range(0, len(flag_str), 2)]
+        flags = [flags_str[i:i+2] for i in range(0, len(flags_str), 2)]
         if flags == []:
             yield event.plain_result("请输入待解码旗语！")
         elif not all(len(flag) == 2 for flag in flags):
