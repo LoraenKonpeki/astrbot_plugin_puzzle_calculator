@@ -20,6 +20,7 @@ class MyPlugin(Star):
         if flags == []:
             yield event.plain_result("请输入待解码旗语！")
         elif not all(len(flag) == 2 for flag in flags):
+            print(f"flags: {flags}")
             yield event.plain_result("旗语必须是长度为2的字符串！")
         else:
             dic_flag = {
