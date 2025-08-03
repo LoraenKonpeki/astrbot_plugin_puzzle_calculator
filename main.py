@@ -18,7 +18,7 @@ class MyPlugin(Star):
         message_chain = event.get_messages()
         logger.info(message_chain)
 
-        flags = [flags_str[i:i+2] for i in range(0, len(flag_str), 2)]
+        flags = [flags_str[i:i+2] for i in range(0, len(flags_str), 2)]
         if flags == []:
             yield event.plain_result("请输入待解码旗语！")
         elif not all(len(flag) == 2 for flag in flags):
