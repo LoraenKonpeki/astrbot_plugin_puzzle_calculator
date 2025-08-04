@@ -74,11 +74,9 @@ class MyPlugin(Star):
                     "QE": "U", "WC": "V", "ED": "W", "EC": "X", "CW": "Y",
                     "DC": "Z"
                 }
-                logger.info("使用手机键盘旗语解码")
 
             result = ""
             for flag in flags:
-                print(f"处理旗语: {flag}")
                 flag = flag.upper()  # 转换为大写以匹配字典
                 if flag in dic_flag:
                     result += dic_flag[flag]
@@ -86,56 +84,7 @@ class MyPlugin(Star):
                     result += dic_flag[flag[1]+flag[0]]
                 else:
                     result += "?"
-            # result = ""
-            # for flag in flags:
-            #     flag = flag.upper()  # 转换为大写以匹配字典
-            #     if flag in dic_flag:
-            #         result += dic_flag[flag]
-            #     elif (flag[1]+flag[0]) in dic_flag:
-            #         result += dic_flag[flag[1]+flag[0]]
-            #     else:
-            #         result += "?"
             yield event.plain_result(f"解码结果: \n{result.lower()}")
-
-    # @filter.command("flk", alias={"flagk", "semaphorek"})
-    # async def flagk_decode(self, event: AstrMessageEvent, flags_str: str):
-    #     """手机键盘旗语解码"""
-    #     message_str = event.message_str
-    #     message_str = event.message_str  # 用户发的纯文本消息字符串
-    #     message_chain = event.get_messages()
-    #     logger.info(message_chain)
-
-    #     flags = [flags_str[i:i+2] for i in range(0, len(flags_str), 2)]
-    #     if flags == []:
-    #         yield event.plain_result("请输入待解码旗语！")
-    #     elif not all(len(flag) == 2 for flag in flags):
-    #         print(f"flags: {flags}")
-    #         yield event.plain_result(f"旗语必须是长度为2的字符串！\n你的输入：{flags}")
-    #     else:
-    #         dic_flag = {
-    #             '78': 'A', '84': 'B', '87': 'C', '88': 'D', '89': 'E',
-    #             '86': 'F', '83': 'G', '74': 'H', '77': 'I', '68': 'J',
-    #             '87': 'K', '97': 'L', '76': 'M', '91': 'N', '84': 'O',
-    #             '94': 'P', '94': 'Q', '64': 'R', '94': 'S', '78': 'T',
-    #             '79': 'U', '93': 'V', '96': 'W', '93': 'X', '98': 'Y',
-    #             '69': 'Z',
-    #             "ZX": "A", "XA": "B", "XQ": "C", "XW": "D", "XE": "E",
-    #             "XD": "F", "XC": "G", "ZA": "H", "QZ": "I", "DW": "J",
-    #             "WZ": "K", "EZ": "L", "ZD": "M", "CZ": "N", "QA": "O",
-    #             "WA": "P", "EA": "Q", "DA": "R", "CA": "S", "QW": "T",
-    #             "QE": "U", "WC": "V", "ED": "W", "EC": "X", "CW": "Y",
-    #             "DC": "Z"
-    #         }
-    #         result = ""
-    #         for flag in flags:
-    #             flag = flag.upper()  # 转换为大写以匹配字典
-    #             if flag in dic_flag:
-    #                 result += dic_flag[flag]
-    #             elif (flag[1]+flag[0]) in dic_flag:
-    #                 result += dic_flag[flag[1]+flag[0]]
-    #             else:
-    #                 result += "?"
-    #         yield event.plain_result(f"解码结果: \n{result.lower()}")
 
     @filter.command("blindhelp", alias={"blhelp"})
     async def blind_help(self, event: AstrMessageEvent):
@@ -213,44 +162,6 @@ class MyPlugin(Star):
                 else:
                     result += "?"
             yield event.plain_result(f"解码结果: \n{result.lower()}")
-
-    # @filter.command("blindk", alias={"blk"})
-    # async def blindk_decode(self, event: AstrMessageEvent):
-    #     """手机键盘盲文解码"""
-    #     message_str = event.message_str  # 用户发的纯文本消息字符串
-    #     message_chain = event.get_messages()
-    #     logger.info(message_chain)
-
-    #     blinds = message_str.strip().split()[1:]
-    #     if blinds == []:
-    #         yield event.plain_result("请输入待解码盲文！")
-    #     else:
-    #         dic_blind = {
-    #             '1': 'A', '14': 'B', '12': 'C', '125': 'D', '15': 'E',
-    #             '124': 'F', '1245': 'G', '145': 'H', '24': 'I', '245': 'J',
-    #             '17': 'K', '147': 'L', '127': 'M', '1257': 'N', '157': 'O',
-    #             '1247': 'P', '12457': 'Q', '1457': 'R', '247': 'S', '2457': 'T',
-    #             '178': 'U', '1478': 'V', '2458': 'W', '1278': 'X', '12578': 'Y',
-    #             '1578': 'Z', '458': '.', '4': ',', '45': ':',
-    #             '47': ';', '257': '@', '2578': '#', '457': '+', '78': '-',
-    #             '27': '/', '57': '*', '4578': '=', '478': '?',
-    #             'Q': 'A', 'AQ': 'B', 'QW': 'C', 'QSW': 'D', 'QS': 'E',
-    #             'AQW': 'F', 'AQSW': 'G', 'AQS': 'H', 'AW': 'I', 'ASW': 'J',
-    #             'QZ': 'K', 'AQZ': 'L', 'QWZ': 'M', 'QSWZ': 'N', 'QSZ': 'O',
-    #             'AQWZ': 'P', 'AQSWZ': 'Q', 'AQSZ': 'R', 'AWZ': 'S', 'ASWZ': 'T',
-    #             'QXZ': 'U', 'AQXZ': 'V', 'ASWX': 'W', 'QWXZ': 'X', 'QSWXZ': 'Y',
-    #             'QSXZ': 'Z', 'ASX': '.', 'A': ',', 'AS': ':',
-    #             'AZ': ';', 'SWZ': '@', 'SWXZ': '#', 'ASZ': '+', 'XZ': '-',
-    #             'WZ': '/', 'SZ': '*', 'ASXZ': '=', 'AXZ': '?'
-    #         }
-    #         result = ""
-    #         for blind in blinds:
-    #             blind = ''.join(sorted(blind.strip())).upper()
-    #             if blind in dic_blind:
-    #                 result += dic_blind[blind]
-    #             else:
-    #                 result += "?"
-    #         yield event.plain_result(f"解码结果: \n{result.lower()}")
 
         async def terminate(self):
             """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
