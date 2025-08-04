@@ -3,7 +3,7 @@ from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 
 
-@register("puzzle_calculator", "Loraen_Konpeki", "在AstrBot上完成简单的古典密码解密和加密功能", "1.0")
+@register("puzzle_calculator", "Loraen_Konpeki", "在AstrBot上完成简单的古典密码解密和加密功能", "1.1")
 class MyPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
@@ -101,7 +101,7 @@ class MyPlugin(Star):
 
         如果你没有数字小键盘，可以使用键盘左半部分的 QW AS ZX 六个键作为输入。例如 "/bl aqw qzx QW Qz"
 
-        如果使用手机九键键盘，仍然用左半部分，请使用：/flk /flagk /semaphorek
+        如果使用手机九键键盘，仍然用左半部分，请使用：/blk /blindk
         """
         yield event.plain_result(help_message)
 
