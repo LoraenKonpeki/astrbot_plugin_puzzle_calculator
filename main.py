@@ -36,6 +36,7 @@ class MyPlugin(Star):
         message_str = event.message_str  # 用户发的纯文本消息字符串
         message_chain = event.get_messages()
         logger.info(message_chain)
+        message_str = message_str.strip().split()
 
         flags = [flags_str[i:i+2] for i in range(0, len(flags_str), 2)]
         if flags == []:
@@ -60,11 +61,11 @@ class MyPlugin(Star):
             }
             if 'k' in message_str[0].lower():  # 检测是否使用手机键盘旗语
                 dic_flag = {
-                    '78': 'A', '84': 'B', '87': 'C', '88': 'D', '89': 'E',
-                    '86': 'F', '83': 'G', '74': 'H', '77': 'I', '68': 'J',
-                    '87': 'K', '97': 'L', '76': 'M', '91': 'N', '84': 'O',
-                    '94': 'P', '94': 'Q', '64': 'R', '94': 'S', '78': 'T',
-                    '79': 'U', '93': 'V', '96': 'W', '93': 'X', '98': 'Y',
+                    '78': 'A', '84': 'B', '81': 'C', '82': 'D', '83': 'E',
+                    '86': 'F', '89': 'G', '74': 'H', '17': 'I', '62': 'J',
+                    '27': 'K', '37': 'L', '76': 'M', '97': 'N', '14': 'O',
+                    '24': 'P', '34': 'Q', '64': 'R', '94': 'S', '12': 'T',
+                    '13': 'U', '29': 'V', '36': 'W', '39': 'X', '92': 'Y',
                     '69': 'Z',
                     "ZX": "A", "XA": "B", "XQ": "C", "XW": "D", "XE": "E",
                     "XD": "F", "XC": "G", "ZA": "H", "QZ": "I", "DW": "J",
