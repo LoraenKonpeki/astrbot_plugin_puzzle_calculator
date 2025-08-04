@@ -74,9 +74,11 @@ class MyPlugin(Star):
                     "QE": "U", "WC": "V", "ED": "W", "EC": "X", "CW": "Y",
                     "DC": "Z"
                 }
+                logger.info("使用手机键盘旗语解码")
 
             result = ""
             for flag in flags:
+                print(f"处理旗语: {flag}")
                 flag = flag.upper()  # 转换为大写以匹配字典
                 if flag in dic_flag:
                     result += dic_flag[flag]
@@ -84,6 +86,15 @@ class MyPlugin(Star):
                     result += dic_flag[flag[1]+flag[0]]
                 else:
                     result += "?"
+            # result = ""
+            # for flag in flags:
+            #     flag = flag.upper()  # 转换为大写以匹配字典
+            #     if flag in dic_flag:
+            #         result += dic_flag[flag]
+            #     elif (flag[1]+flag[0]) in dic_flag:
+            #         result += dic_flag[flag[1]+flag[0]]
+            #     else:
+            #         result += "?"
             yield event.plain_result(f"解码结果: \n{result.lower()}")
 
     # @filter.command("flk", alias={"flagk", "semaphorek"})
