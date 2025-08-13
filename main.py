@@ -1,9 +1,15 @@
 from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
+import flag
 
 
-@register("puzzle_calculator", "Loraen_Konpeki", "在AstrBot上完成简单的古典密码解密和加密功能", "1.1")
+@register(
+    "puzzle_calculator",
+    "Loraen_Konpeki",
+    "在AstrBot上完成简单的古典密码解密和加密功能",
+    "1.1",
+)
 class MyPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
@@ -37,54 +43,134 @@ class MyPlugin(Star):
         message_chain = event.get_messages()
         logger.info(message_chain)
         message_str = message_str.strip().split()
+        yield event.plain_result(flag.decode(message_str))
+        # flags = [flags_str[i : i + 2] for i in range(0, len(flags_str), 2)]
+        # if flags == []:
+        #     yield event.plain_result("请输入待解码旗语！")
+        # elif not all(len(flag) == 2 for flag in flags):
+        #     print(f"flags: {flags}")
+        #     yield event.plain_result(f"旗语必须是长度为2的字符串！\n你的输入：{flags}")
+        # else:
+        #     dic_flag = {
+        #         "12": "A",
+        #         "24": "B",
+        #         "27": "C",
+        #         "28": "D",
+        #         "29": "E",
+        #         "26": "F",
+        #         "23": "G",
+        #         "14": "H",
+        #         "71": "I",
+        #         "68": "J",
+        #         "81": "K",
+        #         "91": "L",
+        #         "16": "M",
+        #         "31": "N",
+        #         "74": "O",
+        #         "84": "P",
+        #         "94": "Q",
+        #         "64": "R",
+        #         "34": "S",
+        #         "78": "T",
+        #         "79": "U",
+        #         "83": "V",
+        #         "96": "W",
+        #         "93": "X",
+        #         "38": "Y",
+        #         "63": "Z",
+        #         "ZX": "A",
+        #         "XA": "B",
+        #         "XQ": "C",
+        #         "XW": "D",
+        #         "XE": "E",
+        #         "XD": "F",
+        #         "XC": "G",
+        #         "ZA": "H",
+        #         "QZ": "I",
+        #         "DW": "J",
+        #         "WZ": "K",
+        #         "EZ": "L",
+        #         "ZD": "M",
+        #         "CZ": "N",
+        #         "QA": "O",
+        #         "WA": "P",
+        #         "EA": "Q",
+        #         "DA": "R",
+        #         "CA": "S",
+        #         "QW": "T",
+        #         "QE": "U",
+        #         "WC": "V",
+        #         "ED": "W",
+        #         "EC": "X",
+        #         "CW": "Y",
+        #         "DC": "Z",
+        #     }
+        #     if "k" in message_str[0].lower():  # 检测是否使用手机键盘旗语
+        #         dic_flag = {
+        #             "78": "A",
+        #             "84": "B",
+        #             "81": "C",
+        #             "82": "D",
+        #             "83": "E",
+        #             "86": "F",
+        #             "89": "G",
+        #             "74": "H",
+        #             "17": "I",
+        #             "62": "J",
+        #             "27": "K",
+        #             "37": "L",
+        #             "76": "M",
+        #             "97": "N",
+        #             "14": "O",
+        #             "24": "P",
+        #             "34": "Q",
+        #             "64": "R",
+        #             "94": "S",
+        #             "12": "T",
+        #             "13": "U",
+        #             "29": "V",
+        #             "36": "W",
+        #             "39": "X",
+        #             "92": "Y",
+        #             "69": "Z",
+        #             "ZX": "A",
+        #             "XA": "B",
+        #             "XQ": "C",
+        #             "XW": "D",
+        #             "XE": "E",
+        #             "XD": "F",
+        #             "XC": "G",
+        #             "ZA": "H",
+        #             "QZ": "I",
+        #             "DW": "J",
+        #             "WZ": "K",
+        #             "EZ": "L",
+        #             "ZD": "M",
+        #             "CZ": "N",
+        #             "QA": "O",
+        #             "WA": "P",
+        #             "EA": "Q",
+        #             "DA": "R",
+        #             "CA": "S",
+        #             "QW": "T",
+        #             "QE": "U",
+        #             "WC": "V",
+        #             "ED": "W",
+        #             "EC": "X",
+        #             "CW": "Y",
+        #             "DC": "Z",
+        #         }
 
-        flags = [flags_str[i:i+2] for i in range(0, len(flags_str), 2)]
-        if flags == []:
-            yield event.plain_result("请输入待解码旗语！")
-        elif not all(len(flag) == 2 for flag in flags):
-            print(f"flags: {flags}")
-            yield event.plain_result(f"旗语必须是长度为2的字符串！\n你的输入：{flags}")
-        else:
-            dic_flag = {
-                "12": "A", "24": "B", "27": "C", "28": "D", "29": "E",
-                "26": "F", "23": "G", "14": "H", "71": "I", "68": "J",
-                "81": "K", "91": "L", "16": "M", "31": "N", "74": "O",
-                "84": "P", "94": "Q", "64": "R", "34": "S", "78": "T",
-                "79": "U", "83": "V", "96": "W", "93": "X", "38": "Y",
-                "63": "Z",
-                "ZX": "A", "XA": "B", "XQ": "C", "XW": "D", "XE": "E",
-                "XD": "F", "XC": "G", "ZA": "H", "QZ": "I", "DW": "J",
-                "WZ": "K", "EZ": "L", "ZD": "M", "CZ": "N", "QA": "O",
-                "WA": "P", "EA": "Q", "DA": "R", "CA": "S", "QW": "T",
-                "QE": "U", "WC": "V", "ED": "W", "EC": "X", "CW": "Y",
-                "DC": "Z"
-            }
-            if 'k' in message_str[0].lower():  # 检测是否使用手机键盘旗语
-                dic_flag = {
-                    '78': 'A', '84': 'B', '81': 'C', '82': 'D', '83': 'E',
-                    '86': 'F', '89': 'G', '74': 'H', '17': 'I', '62': 'J',
-                    '27': 'K', '37': 'L', '76': 'M', '97': 'N', '14': 'O',
-                    '24': 'P', '34': 'Q', '64': 'R', '94': 'S', '12': 'T',
-                    '13': 'U', '29': 'V', '36': 'W', '39': 'X', '92': 'Y',
-                    '69': 'Z',
-                    "ZX": "A", "XA": "B", "XQ": "C", "XW": "D", "XE": "E",
-                    "XD": "F", "XC": "G", "ZA": "H", "QZ": "I", "DW": "J",
-                    "WZ": "K", "EZ": "L", "ZD": "M", "CZ": "N", "QA": "O",
-                    "WA": "P", "EA": "Q", "DA": "R", "CA": "S", "QW": "T",
-                    "QE": "U", "WC": "V", "ED": "W", "EC": "X", "CW": "Y",
-                    "DC": "Z"
-                }
-
-            result = ""
-            for flag in flags:
-                flag = flag.upper()  # 转换为大写以匹配字典
-                if flag in dic_flag:
-                    result += dic_flag[flag]
-                elif (flag[1]+flag[0]) in dic_flag:
-                    result += dic_flag[flag[1]+flag[0]]
-                else:
-                    result += "?"
-            yield event.plain_result(f"解码结果: \n{result.lower()}")
+        #     result = ""
+        #     for flag in flags:
+        #         flag = flag.upper()  # 转换为大写以匹配字典
+        #         if flag in dic_flag:
+        #             result += dic_flag[flag]
+        #         elif (flag[1] + flag[0]) in dic_flag:
+        #             result += dic_flag[flag[1] + flag[0]]
+        #         else:
+        #             result += "?"
+        #     yield event.plain_result(f"解码结果: \n{result.lower()}")
 
     @filter.command("blindhelp", alias={"blhelp"})
     async def blind_help(self, event: AstrMessageEvent):
@@ -117,46 +203,166 @@ class MyPlugin(Star):
             yield event.plain_result("请输入待解码盲文！")
         else:
             dic_blind = {
-                "7": "A", "47": "B", "78": "C", "578": "D", "57": "E",
-                "478": "F", "4578": "G", "457": "H", "48": "I", "458": "J",
-                "17": "K", "147": "L", "178": "M", "1578": "N", "157": "O",
-                "1478": "P", "14578": "Q", "1457": "R", "148": "S", "1458": "T",
-                "127": "U", "1247": "V", "2458": "W", "1278": "X", "12578": "Y",
-                "1257": "Z", "245": ".", "4": ",", "45": ":",
-                "14": ";", "158": "@", "1258": "#", "145": "+", "12": "-",
-                "18": "/", "15": "*", "1245": "=", '124': '?',
-                'Q': 'A', 'AQ': 'B', 'QW': 'C', 'QSW': 'D', 'QS': 'E',
-                'AQW': 'F', 'AQSW': 'G', 'AQS': 'H', 'AW': 'I', 'ASW': 'J',
-                'QZ': 'K', 'AQZ': 'L', 'QWZ': 'M', 'QSWZ': 'N', 'QSZ': 'O',
-                'AQWZ': 'P', 'AQSWZ': 'Q', 'AQSZ': 'R', 'AWZ': 'S', 'ASWZ': 'T',
-                'QXZ': 'U', 'AQXZ': 'V', 'ASWX': 'W', 'QWXZ': 'X', 'QSWXZ': 'Y',
-                'QSXZ': 'Z', 'ASX': '.', 'A': ',', 'AS': ':',
-                'AZ': ';', 'SWZ': '@', 'SWXZ': '#', 'ASZ': '+', 'XZ': '-',
-                'WZ': '/', 'SZ': '*', 'ASXZ': '=', 'AXZ': '?'
+                "7": "A",
+                "47": "B",
+                "78": "C",
+                "578": "D",
+                "57": "E",
+                "478": "F",
+                "4578": "G",
+                "457": "H",
+                "48": "I",
+                "458": "J",
+                "17": "K",
+                "147": "L",
+                "178": "M",
+                "1578": "N",
+                "157": "O",
+                "1478": "P",
+                "14578": "Q",
+                "1457": "R",
+                "148": "S",
+                "1458": "T",
+                "127": "U",
+                "1247": "V",
+                "2458": "W",
+                "1278": "X",
+                "12578": "Y",
+                "1257": "Z",
+                "245": ".",
+                "4": ",",
+                "45": ":",
+                "14": ";",
+                "158": "@",
+                "1258": "#",
+                "145": "+",
+                "12": "-",
+                "18": "/",
+                "15": "*",
+                "1245": "=",
+                "124": "?",
+                "Q": "A",
+                "AQ": "B",
+                "QW": "C",
+                "QSW": "D",
+                "QS": "E",
+                "AQW": "F",
+                "AQSW": "G",
+                "AQS": "H",
+                "AW": "I",
+                "ASW": "J",
+                "QZ": "K",
+                "AQZ": "L",
+                "QWZ": "M",
+                "QSWZ": "N",
+                "QSZ": "O",
+                "AQWZ": "P",
+                "AQSWZ": "Q",
+                "AQSZ": "R",
+                "AWZ": "S",
+                "ASWZ": "T",
+                "QXZ": "U",
+                "AQXZ": "V",
+                "ASWX": "W",
+                "QWXZ": "X",
+                "QSWXZ": "Y",
+                "QSXZ": "Z",
+                "ASX": ".",
+                "A": ",",
+                "AS": ":",
+                "AZ": ";",
+                "SWZ": "@",
+                "SWXZ": "#",
+                "ASZ": "+",
+                "XZ": "-",
+                "WZ": "/",
+                "SZ": "*",
+                "ASXZ": "=",
+                "AXZ": "?",
             }
-            if 'k' in message_str[0].lower():  # 检测是否使用手机键盘盲文
+            if "k" in message_str[0].lower():  # 检测是否使用手机键盘盲文
                 dic_blind = {
-                    '1': 'A', '14': 'B', '12': 'C', '125': 'D', '15': 'E',
-                    '124': 'F', '1245': 'G', '145': 'H', '24': 'I', '245': 'J',
-                    '17': 'K', '147': 'L', '127': 'M', '1257': 'N', '157': 'O',
-                    '1247': 'P', '12457': 'Q', '1457': 'R', '247': 'S', '2457': 'T',
-                    '178': 'U', '1478': 'V', '2458': 'W', '1278': 'X', '12578': 'Y',
-                    '1578': 'Z', '458': '.', '4': ',', '45': ':',
-                    '47': ';', '257': '@', '2578': '#', '457': '+', '78': '-',
-                    '27': '/', '57': '*', '4578': '=', '478': '?',
-                    'Q': 'A', 'AQ': 'B', 'QW': 'C', 'QSW': 'D', 'QS': 'E',
-                    'AQW': 'F', 'AQSW': 'G', 'AQS': 'H', 'AW': 'I', 'ASW': 'J',
-                    'QZ': 'K', 'AQZ': 'L', 'QWZ': 'M', 'QSWZ': 'N', 'QSZ': 'O',
-                    'AQWZ': 'P', 'AQSWZ': 'Q', 'AQSZ': 'R', 'AWZ': 'S', 'ASWZ': 'T',
-                    'QXZ': 'U', 'AQXZ': 'V', 'ASWX': 'W', 'QWXZ': 'X', 'QSWXZ': 'Y',
-                    'QSXZ': 'Z', 'ASX': '.', 'A': ',', 'AS': ':',
-                    'AZ': ';', 'SWZ': '@', 'SWXZ': '#', 'ASZ': '+', 'XZ': '-',
-                    'WZ': '/', 'SZ': '*', 'ASXZ': '=', 'AXZ': '?'
+                    "1": "A",
+                    "14": "B",
+                    "12": "C",
+                    "125": "D",
+                    "15": "E",
+                    "124": "F",
+                    "1245": "G",
+                    "145": "H",
+                    "24": "I",
+                    "245": "J",
+                    "17": "K",
+                    "147": "L",
+                    "127": "M",
+                    "1257": "N",
+                    "157": "O",
+                    "1247": "P",
+                    "12457": "Q",
+                    "1457": "R",
+                    "247": "S",
+                    "2457": "T",
+                    "178": "U",
+                    "1478": "V",
+                    "2458": "W",
+                    "1278": "X",
+                    "12578": "Y",
+                    "1578": "Z",
+                    "458": ".",
+                    "4": ",",
+                    "45": ":",
+                    "47": ";",
+                    "257": "@",
+                    "2578": "#",
+                    "457": "+",
+                    "78": "-",
+                    "27": "/",
+                    "57": "*",
+                    "4578": "=",
+                    "478": "?",
+                    "Q": "A",
+                    "AQ": "B",
+                    "QW": "C",
+                    "QSW": "D",
+                    "QS": "E",
+                    "AQW": "F",
+                    "AQSW": "G",
+                    "AQS": "H",
+                    "AW": "I",
+                    "ASW": "J",
+                    "QZ": "K",
+                    "AQZ": "L",
+                    "QWZ": "M",
+                    "QSWZ": "N",
+                    "QSZ": "O",
+                    "AQWZ": "P",
+                    "AQSWZ": "Q",
+                    "AQSZ": "R",
+                    "AWZ": "S",
+                    "ASWZ": "T",
+                    "QXZ": "U",
+                    "AQXZ": "V",
+                    "ASWX": "W",
+                    "QWXZ": "X",
+                    "QSWXZ": "Y",
+                    "QSXZ": "Z",
+                    "ASX": ".",
+                    "A": ",",
+                    "AS": ":",
+                    "AZ": ";",
+                    "SWZ": "@",
+                    "SWXZ": "#",
+                    "ASZ": "+",
+                    "XZ": "-",
+                    "WZ": "/",
+                    "SZ": "*",
+                    "ASXZ": "=",
+                    "AXZ": "?",
                 }
 
             result = ""
             for blind in blinds:
-                blind = ''.join(sorted(blind.strip())).upper()
+                blind = "".join(sorted(blind.strip())).upper()
                 if blind in dic_blind:
                     result += dic_blind[blind]
                 else:
