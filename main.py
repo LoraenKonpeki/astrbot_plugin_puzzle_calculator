@@ -22,16 +22,16 @@ class MyPlugin(Star):
         message_chain = event.get_messages()
         logger.info(message_chain)
         help_message = """
-        旗语解码帮助:
+旗语解码帮助:
 
-        /fl（或 /flag 或 /semaphore）+旗语
-        数字对应方向参考电脑数字小键盘。（例如：2↓ 4← 8↑ 9↗）
-        为了输入速度，建议直接将所有两个一组的旗语拼起来输入。例如 "/fl 62797281"。（当然也可以用空格分隔，如 "/fl 62 79 72 81"）
-        不用担心输入顺序，28和82表示同一个旗语。
+/fl（或 /flag 或 /semaphore）+旗语
+数字对应方向参考电脑数字小键盘。（例如：2↓ 4← 8↑ 9↗）
+为了输入速度，建议直接将所有两个一组的旗语拼起来输入。例如 "/fl 62797281"。（当然也可以用空格分隔，如 "/fl 62 79 72 81"）
+不用担心输入顺序，28和82表示同一个旗语。
 
-        如果你没有数字小键盘，可以使用键盘左半部分的 QWEDCXZA 八个方向作为输入。例如 "/fl dxQexqWZ"（不区分大小写）
+如果你没有数字小键盘，可以使用键盘左半部分的 QWEDCXZA 八个方向作为输入。例如 "/fl dxQexqWZ"（不区分大小写）
 
-        如果使用手机九键键盘方向，请使用：/flk /flagk /semaphorek
+如果使用手机九键键盘方向，请使用：/flk /flagk /semaphorek
         """
         yield event.plain_result(help_message)
 
@@ -179,16 +179,16 @@ class MyPlugin(Star):
         message_chain = event.get_messages()
         logger.info(message_chain)
         help_message = """
-        盲文解码帮助:
+盲文解码帮助:
 
-        可用指令：/bl /blind
-        数字对应六个点参考电脑数字小键盘左半部分六个数字。（每排两个点分别为 78 45 12）
-        盲文之间用空格分隔，例如 "/bl 478 712 78 71"。
-        不用担心输入顺序。
+可用指令：/bl /blind
+数字对应六个点参考电脑数字小键盘左半部分六个数字。（每排两个点分别为 78 45 12）
+盲文之间用空格分隔，例如 "/bl 478 712 78 71"。
+不用担心输入顺序。
 
-        如果你没有数字小键盘，可以使用键盘左半部分的 QW AS ZX 六个键作为输入。例如 "/bl aqw qzx QW Qz"
+如果你没有数字小键盘，可以使用键盘左半部分的 QW AS ZX 六个键作为输入。例如 "/bl aqw qzx QW Qz"
 
-        如果使用手机九键键盘，仍然用左半部分，请使用：/blk /blindk
+如果使用手机九键键盘，仍然用左半部分，请使用：/blk /blindk
         """
         yield event.plain_result(help_message)
 
@@ -374,13 +374,13 @@ class MyPlugin(Star):
     async def morse_help(self, event: AstrMessageEvent):
         """摩尔斯电码帮助"""
         help_text = """
-        摩尔斯电码帮助：
-        /morse <摩尔斯电码> 或 /ms <摩尔斯电码>，电码之间用空格分隔
-        示例：/ms .- -... -.-.
-                     
-        横线可以用以下字符：- _ — 一
-        点可以用以下字符：. 、 · *
-        例如：/morse *一 —、、、 _·_·
+摩尔斯电码帮助：
+/morse <摩尔斯电码> 或 /ms <摩尔斯电码>，电码之间用空格分隔
+示例：/ms .- -... -.-.
+                
+横线可以用以下字符：- _ — 一
+点可以用以下字符：. 、 · *
+例如：/morse *一 —、、、 _·_·
                      """
         yield event.plain_result(help_text)
 
