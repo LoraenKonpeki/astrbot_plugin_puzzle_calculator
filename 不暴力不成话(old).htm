@@ -1,0 +1,2901 @@
+<!DOCTYPE HTML
+	PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<!-- saved from url=(0039)http://welkin.byethost3.com/puzzle.html -->
+<HTML xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<HEAD>
+	<TITLE>Puzzle Calculator</TITLE>
+	<META http-equiv=Content-Type content="text/html; charset=gb2312">
+	<STYLE type=text/css>
+		BODY {
+			FONT-SIZE: 10pt;
+			FONT-FAMILY: Arial
+		}
+
+		TD {
+			FONT-SIZE: 10pt;
+			FONT-FAMILY: Arial
+		}
+
+		INPUT {
+			FONT-FAMILY: Courier New
+		}
+
+		.green {
+			COLOR: #fff;
+			BACKGROUND-COLOR: #0d0
+		}
+
+		.red {
+			COLOR: #fff;
+			BACKGROUND-COLOR: #c00
+		}
+
+		A {
+			TEXT-DECORATION: none
+		}
+
+		A:visited {
+			TEXT-DECORATION: none
+		}
+
+		#usw TD {
+			PADDING-LEFT: 20px;
+			FONT-FAMILY: Courier New
+		}
+
+		BODY {
+			OVERFLOW-Y: auto;
+			HEIGHT: 100%
+		}
+
+		#fixedMenu {
+			LEFT: 4em;
+			POSITION: fixed;
+			TOP: 4em
+		}
+
+		HTML #fixedMenu {
+			POSITION: absolute
+		}
+	</STYLE>
+
+	<SCRIPT type=text/javascript>
+function $(id) {
+return document.getElementById(id);
+}
+
+strrev = function(str) {
+	  return str.split("").reverse().join("");
+}
+
+function freqL(c) {
+	this.char = c;
+	this.score = 0;
+}
+
+function wordFrequency() {
+	var input = document.countfreq.input.value;
+	input = input.toLowerCase().replace(/\s+/g, ' ');
+	var inputArray = input.split(' ');
+
+	var sum = 0;
+	
+	var result = {};
+	var w;
+	var output = "<table>";
+	var wordCount = 0;
+	for(var i = 0; i < inputArray.length; i++) {
+		w = inputArray[i];
+		if(typeof result[w] == "undefined") {
+			result[w] = 1;
+			wordCount++;
+			sum++;
+		} else {
+			result[w]++;
+			sum++;
+		}
+	}
+	
+	for(var i in result) {
+		output += ('<tr><td>' + i + '</td><td>' + result[i] + '</td></tr>');
+	}
+	
+	output += ('<tr><td>总计' + wordCount + '个词</td><td>' + sum + '</td></tr>');
+	
+	$('resultsw').innerHTML = output + "</table>";
+}
+
+function alphaFrequency() {
+	var input = document.countfreq.input.value;
+	input = input.toLowerCase();
+	var output = '';
+
+	var hasNumber = false;
+	var hasLetter = false;
+	
+	var counts = new Array(); // array to store count of each letter
+	for (i=0; i<26; i++) {
+		var c = String.fromCharCode(i+97);	
+		counts[i] = new freqL(c);
+	}
+	
+	for (i=26; i<36; i++) {
+		var c = String.fromCharCode(i+22);
+		counts[i] = new freqL(c);
+	}
+	
+	for(var i = 0; i < input.length; i++) {
+		var val = input.charCodeAt(i) - 97;
+		if(val >= 0 && val < 26) {
+			counts[val].score++;
+			hasLetter = true;
+		} else if(val >= -49 && val <= -40) {
+			counts[val + 75].score++;
+			hasNumber = true;
+		}
+	}
+	
+	if(hasLetter && !hasNumber) {
+		counts = counts.slice(0,26); 
+	} else if (!hasLetter && hasNumber) {
+		counts = counts.slice(26);
+	}
+
+	for(var i = 0; i < counts.length; i++) {
+		output += (counts[i].char + '&nbsp;&nbsp;' + (counts[i].score > 0 ? counts[i].score : ' ') + '<br/>');
+	}
+	document.getElementById('results').innerHTML = output;
+	
+	counts.sort(USW_sort);
+	output = '';
+	for(var i = 0; i < counts.length; i++) {
+		output += (counts[i].char + '&nbsp;&nbsp;' + (counts[i].score > 0 ? counts[i].score : ' ') + '<br/>');
+	}
+	document.getElementById('resultsOrderedByFrequency').innerHTML = output;
+
+	output = '';
+	if(document.countfreq.count2.checked) {
+		var d_count = {};
+		for(i = 0; i < input.length - 1; i++) {
+			var d = input.substring(i,i+2);
+			if(!d.match(/\s/)) {
+				if(typeof d_count[d] == "undefined") {
+					d_count[d] = 1;
+				} else {
+					d_count[d]++;
+				}
+			}
+		}
+		for(i in d_count) {
+			output += (i + '&nbsp;&nbsp;' + d_count[i] + '<br/>');
+		}
+	}
+	$('results2').innerHTML = output;
+	
+	output = '';
+	if(document.countfreq.count3.checked) {
+		var t_count = {};
+		for(i = 0; i < input.length - 2; i++) {
+			var t = input.substring(i,i+3);
+				if(!t.match(/\s/)) {
+				if(typeof t_count[t] == "undefined") {
+					t_count[t] = 1;
+				} else {
+					t_count[t]++;
+				}
+			}
+		}
+		for(i in t_count) {
+			output += (i + '&nbsp;&nbsp;' + t_count[i] + '<br/>');
+		}
+	}
+	$('results3').innerHTML = output;
+}
+
+function v10toX(n,decStr)
+{
+	var decStrs = decStr.split(' ');
+	var ret = "";
+	for(var i in decStrs) {
+		var xStr = "";
+		var dec = parseInt(decStrs[i]);
+		if(dec == 0) {
+			xStr = '0';
+		} else {
+			while (dec > 0) {
+				var b = dec % n;
+				xStr = String(b) + xStr;
+				dec = (dec - b) / n;
+			}
+		}
+		if(ret != "") {
+			ret += " ";
+		}
+		ret += xStr;
+	}
+	return ret;
+}
+
+function vXto10(n, xStr)
+{
+	var xStrs = xStr.split(' ');
+	var ret = "";
+	for(var i in xStrs) {
+		var dec = 0;
+		var x = xStrs[i];
+		for(var j = 0; j < x.length; j++) {
+			var xi = Number(x.charAt(j))
+			if(xi >= n) {
+				dec = "*";
+				break;
+			}
+			dec *= n;
+			dec += xi;
+		}
+		if(ret != "") {
+			ret += " ";
+		}
+		ret += dec;
+	}
+	return ret;
+}
+
+// Update the numeric fields
+function updateNum(dec) {
+	decStr = new String(dec);
+	document.numbers.binary.value = dec2bin(decStr);
+	document.numbers.hex.value = dec2hex(decStr);
+	document.numbers.morse.value = text2morse(decStr);
+	document.numbers.decimal.value = decStr;
+	document.numbers.symbols.value = dec2sym(decStr);
+	document.numbers.elements.value = dec2ele(decStr);
+	document.numbers.cellphoneP.value = dec2cellphoneP(decStr);
+	document.numbers.cellphoneS.value = cellphone2text(decStr);
+	document.numbers.seqS.value = seq2text(decStr);
+	document.numbers.ASCIIS.value = ascii2text(decStr);
+	document.numbers.VS.value = v2text(decStr);
+	document.numbers.keyboardS.value = keyboard2text(decStr);
+	document.numbers.keyboardS2.value = keyboard2text2(decStr);
+	document.numbers.dKeyboardS.value = dKeyboard2text(decStr);
+	document.numbers.toBaseS.value = v10toX(document.numbers.toBase.value, decStr);
+}
+
+// unidirectional
+function updateStr2(text) {
+	document.strings.text.value = text;
+}
+
+// Update the string fields
+function updateStr(text) {
+	document.strings.text.value = text;
+	document.strings.rev.value = strrev(text);
+	document.strings.ascii.value = text2ascii(text);
+	document.strings.morse.value = text2morse(text);
+	document.strings.seq.value = text2seq(text);
+	document.strings.atbash.value = atbash2text(text);
+	document.strings.cellphone.value = text2cellphone(text);
+	document.strings.keyboard.value = text2keyboard(text);
+	document.strings.vTip.value = text2v(text);
+	document.strings.semaphore.value = text2semaphore(text);
+	document.strings.softkey.value = text2softkey(text);
+}
+
+function test(val) {
+	alert(val);
+}
+
+symbols = [')','!','@','#','$','%','^','&','*','('];
+
+function dec2sym(cipher) {
+	var text = "";
+	for (var i = 0; i < cipher.length; i++) {
+		var c = cipher.charAt(i);
+		if(c >= '0' && c <= '9') {
+			text += symbols[parseInt(c)];
+		}
+		else {
+			text += c;
+		}
+	}
+	return text;
+}
+
+function sym2dec(cipher) {
+	var text = "";
+	for (var i = 0; i < cipher.length; i++) {
+		var c = cipher.charAt(i);
+		var j;
+		for(j = 0; j < 10; j++) {
+			if(c == symbols[j]) {
+				text += j;
+				break;
+			}
+		}
+		if(j == 10) {
+			text += c;
+		}
+	}
+	return text;
+}
+
+var elementString = 'H,He,Li,Be,B,C,N,O,F,Ne,Na,Mg,Al,Si,P,S,Cl,Ar,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,As,Se,Br,Kr,Rb,Sr,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,In,Sn,Sb,Te,I,Xe,Cs,Ba,La,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Tl,Pb,Bi,Po,At,Rn,Fr,Ra,Ac,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr,Rf,Db,Sg,Bh,Hs,Mt,Ds,Rg';
+var elements = elementString.split(',');
+
+function dec2ele(decStr) {
+	var decStrs = decStr.split(' ');
+	var ret = "";
+	for(var i in decStrs) {
+		var d = parseInt(decStrs[i]);
+		if(!isNaN(d)) {
+			ret += (elements[d-1] + " ");
+		}
+	}
+	return ret;
+}
+
+var cellphonePCodes = ['0   ', '1   ', 'abc ', 'def ', 'ghi ', 'jkl ', 'mno ', 'pqrs', 'tuv ', 'wxyz'];
+function dec2cellphoneP(decStr) {
+	var s1 = "", s2 = "", s3 = "", s4 = "";
+	for(var i = 0; i < decStr.length; i++) {
+		var c = decStr.charAt(i);
+		var d = parseInt(c);
+		if(isNaN(d)) {
+			s1 += c;
+			s2 += ' ';
+			s3 += ' ';
+			s4 += ' ';
+		} else {
+			s1 += cellphonePCodes[d].charAt(0);
+			s2 += cellphonePCodes[d].charAt(1);
+			s3 += cellphonePCodes[d].charAt(2);
+			s4 += cellphonePCodes[d].charAt(3);
+		}
+	}
+	return s1 + '\n' + s2 + '\n' + s3 + '\n' + s4;
+}
+
+function ele2dec(eleStr) {
+	var eleStrs = eleStr.toLowerCase().split(' ');
+	var ret = "";
+	for(var i in eleStrs) {
+		var es = eleStrs[i];
+		for(var j in elements) {
+			if(elements[j].toLowerCase() == es) {
+				ret += ((parseInt(j)+1) + " ");
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
+function sym2dec(cipher) {
+	var text = "";
+	for (var i = 0; i < cipher.length; i++) {
+		var c = cipher.charAt(i);
+		var j;
+		for(j = 0; j < 10; j++) {
+			if(c == symbols[j]) {
+				text += j;
+				break;
+			}
+		}
+		if(j == 10) {
+			text += c;
+		}
+	}
+	return text;
+}
+
+function dec2bin(decStr) {
+	var decStrs = decStr.split(' ');
+	var ret = "";
+	for(var i in decStrs) {
+		var binStr = "";
+		var dec = parseInt(decStrs[i]);
+		if(dec == 0) {
+			binStr = '0';
+		} else {
+			while (dec > 0) {
+				if (dec % 2 == 0) {
+					binStr = "0" + binStr;
+				} else {
+					binStr = "1" + binStr;
+				}
+				dec = parseInt(dec / 2);
+			}
+		}
+		ret += (binStr + " ");
+	}
+	return ret;
+}
+
+function bin2dec(input) {
+	var binStrs = input.split(' ');
+	var ret = "";
+	for(var i in binStrs) {
+		var binStr = binStrs[i];
+		var dec = 0;
+		var pow = 1;
+		for (i = 0; i < binStr.length; i++) {
+			if (binStr.charAt(binStr.length - i - 1) == "1") {
+				dec += pow;
+			}
+			pow *= 2;
+		}
+		ret += (dec + ' ');
+	}
+	return ret;
+}
+
+
+hexChars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
+
+function dec2hex(decStr) {
+	var decStrs = decStr.split(' ');
+	var ret = "";
+	for(var i in decStrs) {
+		dec = parseInt(decStrs[i]);
+		hexStr = "";
+
+		if(dec == 0) {
+			hexStr = '0';
+		} else {		
+			while (dec > 0) {
+				r = dec % 16;
+				hexStr = hexChars[r] + hexStr;
+				dec = parseInt(dec / 16);
+
+			}
+		}
+		
+		ret += (hexStr + " ");
+	}
+	return ret;
+}
+
+// Converts a number in hex to it's decimal equivalent
+function hex2dec(input) {
+	var hexStrs = input.toUpperCase().split(' ');
+	var ret = "";
+	for(var i in hexStrs) {
+		var hexStr = hexStrs[i];
+		dec = 0;
+		pow = 1;
+		for (k = 0; k < hexStr.length; k++) {	
+			dec += pow * hexVal(hexStr.charAt(hexStr.length - k - 1));
+			pow *= 16;
+		}
+		ret += (dec + " ");
+	}
+	return ret;
+}
+
+// Convert a single hex digit into it's decimal equivalent
+function hexVal(hexChar) {
+	for (i = 0; i < hexChars.length; i++) {
+		if (hexChars[i] == hexChar) {
+			return i;
+		}
+	}
+	return 100000000;
+}
+
+
+letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .,?:-!0123456789";
+morse = new Array(
+	".-","-...","-.-.","-..",".","..-.",
+	"--.","....","..",".---","-.-",".-..",
+	"--","-.","---",".--.","--.-",".-.",
+	"...","-","..-","...-",".--","-..-",
+	"-.--","--..",
+
+	// repeat from a-z for caps
+	".-","-...","-.-.","-..",
+	".","..-.","--.","....","..",".---",
+	"-.-",".-..","--","-.","---",".--.",
+	"--.-",".-.","...","-","..-","...-",
+	".--","-..-","-.--","--.."," ",".-.-.-",
+	"--..--","..--..","---...","-....-","!",
+
+	// 0-9
+	"-----", ".----", "..---", "...--", "....-",
+	".....", "-....", "--...", "---..", "----.");
+morseSep = " ";
+
+function onchangeMorse(morseStr) {
+	updateStr(morse2text(morseStr));
+	morseStr = morseStr.replace(/\*/g, "."); 
+	morseStr = morseStr.replace(/\//g, " "); 
+	morseStr = morseStr.replace(/-/g, "*"); 
+	morseStr = morseStr.replace(/\./g, "-"); 
+	document.strings.morse2.value = morse2text(morseStr);
+}
+
+// Convert a series of morse code entries into text
+function morse2text(morseStr) {
+	morseStr = morseStr.replace(/\*/g, "."); 
+	morseStr = morseStr.replace(/\//g, " "); 
+
+
+	morseStrs = morseStr.split(morseSep);
+	ret = "";
+	for (m = 0; m < morseStrs.length; m++) {
+		search = morseStrs[m].replace(/ /g, ""); 
+
+		if (search.length == 0) {
+			continue;
+		}
+		ret += morseStr2text(search);
+	}
+	return ret;
+}
+
+// Convert a single morse code entry into text
+function morseStr2text(morseStr) {
+	for (i = 0; i < morse.length; i++) {
+		if (morse[i] == morseStr) {
+			return letters.charAt(i);
+		}
+	}
+	return "^"; 
+}
+
+// Convert text into morse code
+function text2morse(text) {
+	output = "";
+	for(countMorse = 0; countMorse < text.length; countMorse++) {
+		daChar = text.charAt(countMorse);
+		for (im = 0; im < letters.length; im++) {
+			if (daChar == letters.charAt(im)) {
+				output += morse[im] + morseSep;
+				continue;
+			}
+		}
+	}
+	return output;
+}
+
+// Convert text into seq code
+function text2seq(text) {
+	output = "";
+	for(countSeq = 0; countSeq < text.length; countSeq++) {
+		daChar = text.charAt(countSeq);
+		if(daChar >= 'a' && daChar <= 'z') {
+			output += (char2ASCII(daChar) - char2ASCII('a') + 1) + ' ';
+		} else if(daChar >= 'A' && daChar <= 'Z') {
+			output += (char2ASCII(daChar) - char2ASCII('A') + 1) + ' ';
+		} else {
+			output += daChar + ' ';
+		}
+	}
+	return output;
+}
+
+// Convert a series of numbers into letters
+function seq2text(seq) {
+	text = "";
+	seqVals = seq.split(' ');
+
+	for (av = 0; av < seqVals.length; av++) {
+		if (seqVals[av] == "") {
+			continue;
+		}
+		seqVals[av] = seqVals[av].replace(/^[0]+/,"");
+		if(seqVals[av] == "") {
+			seqVals[av] = "0";
+		}
+		text += ASCII2char((parseInt(seqVals[av]) + 25) % 26 + 65);
+	}
+	return text;
+}
+
+// decipher atbash
+function atbash2text(cipher) {
+	var output = "";
+	for(count = 0; count < cipher.length; count++) {
+		daChar = cipher.charAt(count);
+		if(daChar >= 'a' && daChar <= 'z') {
+			var cv = ASCII2char(26-(char2ASCII(daChar) - char2ASCII('a') + 1)+char2ASCII('a'));
+			output += cv;
+		} else if(daChar >= 'A' && daChar <= 'Z') {
+			var cv = ASCII2char(26-(char2ASCII(daChar) - char2ASCII('A') + 1)+char2ASCII('A'));
+			output += cv;
+		} else {
+			output += daChar;
+		}
+	}
+	return output;
+}
+
+var cellphoneCodes = [21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53, 61, 62, 63, 71, 72, 73, 74, 81, 82, 83, 91, 92, 93, 94];
+
+function cellphone2text(cipher) {
+	var output = "";
+	cipher = cipher.replace(/ /g, "");
+	for(var j = 0; j < cipher.length; j+=2) {
+		var cpcode = parseInt(cipher.substring(j, j+2));
+		var i;
+		for(i = 0; i < 26; i++) {
+			if(cpcode == cellphoneCodes[i]) {
+				break;
+			}
+		}
+		if(i == 26) {
+			output += "*";
+		} else {
+			output += ASCII2char(char2ASCII('a') + i);
+		}
+	}
+	return output;
+}
+
+function text2cellphone(text) {
+	var output = "";
+	text = text.toLowerCase();
+	for(countSeq = 0; countSeq < text.length; countSeq++) {
+		daChar = text.charAt(countSeq);
+		if(daChar >= 'a' && daChar <= 'z') {
+			output += cellphoneCodes[char2ASCII(daChar) - char2ASCII('a')] + ' ';
+		} else {
+			output += daChar + ' ';
+		}
+	}
+	return output;
+}
+
+var softkeyCodes = '■︿＠▲☆※→←◇↑↓〓￣＿◆□§★△○◎＼№＆●＃';
+
+function softkey2text(cipher) {
+	var output = "";
+	cipher = cipher.replace(/\^/g, '︿').replace(/＾/g,'︿');
+	for(var j = 0; j < cipher.length; j++) {
+		var cpcode = cipher.charAt(j);
+		var i;
+		for(i = 0; i < 26; i++) {
+			if(cpcode == softkeyCodes.charAt(i)) {
+				break;
+			}
+		}
+		if(i == 26) {
+			output += cpcode;
+		} else {
+			output += ASCII2char(char2ASCII('a') + i);
+		}
+	}
+	return output;
+}
+
+function text2softkey(text) {
+	var output = "";
+	text = text.toLowerCase();
+	for(countSeq = 0; countSeq < text.length; countSeq++) {
+		daChar = text.charAt(countSeq);
+		if(daChar >= 'a' && daChar <= 'z') {
+			output += softkeyCodes.charAt(char2ASCII(daChar) - char2ASCII('a'));
+		} else {
+			output += daChar + ' ';
+		}
+	}
+	return output;
+}
+
+var keyboardCodes = [12,53,33,32,31,42,52,62,81,72,82,92,73,63,91,'01',11,41,22,51,71,43,21,23,61,13];
+var keyboardCodes2 = [12,51,31,32,33,42,52,62,83,72,82,92,71,61,93,'03',13,43,22,53,73,41,23,21,63,11];
+var dKeyboardCodes = [14,51,31,34,37,44,54,64,87,74,84,94,71,61,97,'07',17,47,24,57,77,41,27,21,67,13];
+
+function dKeyboard2text(cipher) {
+	var output = "";
+	cipher = cipher.replace(/ /g, ""); 
+	for(var j = 0; j < cipher.length; j+=2) {
+		var cpcode = parseInt(cipher.substring(j, j+2));
+		var i;
+		for(i = 0; i < 26; i++) {
+			if(cpcode == dKeyboardCodes[i]) {
+				break;
+			}
+		}
+		if(i == 26) {
+			output += "*";
+		} else {
+			output += ASCII2char(char2ASCII('a') + i);
+		}
+	}
+	return output;
+}
+
+function keyboard2text(cipher) {
+	var output = "";
+	cipher = cipher.replace(/ /g, ""); 
+	for(var j = 0; j < cipher.length; j+=2) {
+		var cpcode = parseInt(cipher.substring(j, j+2));
+		var i;
+		for(i = 0; i < 26; i++) {
+			if(cpcode == keyboardCodes[i]) {
+				break;
+			}
+		}
+		if(i == 26) {
+			output += "*";
+		} else {
+			output += ASCII2char(char2ASCII('a') + i);
+		}
+	}
+	return output;
+}
+
+function keyboard2text2(cipher) {
+	var output = "";
+	cipher = cipher.replace(/ /g, ""); 
+	for(var j = 0; j < cipher.length; j+=2) {
+		var cpcode = parseInt(cipher.substring(j, j+2));
+		var i;
+		for(i = 0; i < 26; i++) {
+			if(cpcode == keyboardCodes2[i]) {
+				break;
+			}
+		}
+		if(i == 26) {
+			output += "*";
+		} else {
+			output += ASCII2char(char2ASCII('a') + i);
+		}
+	}
+	return output;
+}
+
+function text2keyboard(text) {
+	var output = "";
+	text = text.toLowerCase();
+	for(countSeq = 0; countSeq < text.length; countSeq++) {
+		daChar = text.charAt(countSeq);
+		if(daChar >= 'a' && daChar <= 'z') {
+			output += keyboardCodes[char2ASCII(daChar) - char2ASCII('a')] + ' ';
+		} else {
+			output += daChar + ' ';
+		}
+	}
+	return output;
+}
+
+var vCodes = [13, 58, 36, 35, 34, 46, 57, 68, 89, 79, 80, '9-', 70, 69, 90, '0-', 12, 45, 24, 56, 78, 47, 23, 25, 67, 14,
+              31, 85, 63, 53, 43, 64, 75, 86, 98, 97, '08', '-9', '07', 96, '09', '-0', 21, 54, 42, 65, 87, 74, 32, 52, 76, 41];
+function v2text(cipher) {
+	var output = "";
+	cipher = cipher.replace(/ /g, ""); 
+	for(var j = 0; j < cipher.length; j+=2) {
+		var cpcode = cipher.substring(j, j+2);
+		var i;
+		for(i = 0; i < 52; i++) {
+			if(cpcode == vCodes[i]) {
+				break;
+			}
+		}
+		if(i == 52) {
+			output += "*";
+		} else {
+			output += ASCII2char(char2ASCII('a') + (i % 26));
+		}
+	}
+	return output;
+}
+
+function text2v(text) {
+	var output = "";
+	text = text.toLowerCase();
+	for(countSeq = 0; countSeq < text.length; countSeq++) {
+		daChar = text.charAt(countSeq);
+		if(daChar >= 'a' && daChar <= 'z') {
+			output += vCodes[char2ASCII(daChar) - char2ASCII('a')] + ' ';
+		} else {
+			output += daChar + ' ';
+		}
+	}
+	return output;
+}
+
+var semaphoreCodes = [78, 48, 18, 28, 38, 68, 89, 47, 17, 26, 27, 37, 67, 79, 14, 24, 34, 46, 49, 12, 13, 29, 36, 39, 16, 69,
+					 87, 84, 81, 82, 83, 86, 98, 74, 71, 62, 72, 73, 76, 97, 41, 42, 43, 64, 94, 21, 31, 92, 63, 93, 61, 96];
+function semaphore2text(cipher) {
+	var output = "";
+	cipher = cipher.replace(/ /g, ""); 
+	for(var j = 0; j < cipher.length; j+=2) {
+		var cpcode = cipher.substring(j, j+2);
+		var i;
+		for(i = 0; i < 52; i++) {
+			if(cpcode == semaphoreCodes[i]) {
+				break;
+			}
+		}
+		if(i == 52) {
+			output += "*";
+		} else {
+			output += ASCII2char(char2ASCII('a') + (i % 26));
+		}
+	}
+	return output;
+}
+
+function text2semaphore(text) {
+	var output = "";
+	for(countSeq = 0; countSeq < text.length; countSeq++) {
+		daChar = text.charAt(countSeq);
+		if(daChar >= 'a' && daChar <= 'z') {
+			output += semaphoreCodes[char2ASCII(daChar) - char2ASCII('a')] + ' ';
+		} else if(daChar >= 'A' && daChar <= 'Z') {
+			output += semaphoreCodes[char2ASCII(daChar) - char2ASCII('A')] + ' ';
+		} else {
+			output += daChar + ' ';
+		}
+	}
+	return output;
+}
+
+
+var codonsEncoding = {
+'uuu' : 'f',
+'uuc' : 'f',
+'uua' : 'l',
+'uug' : 'l',
+
+'ucu' : 's',
+'ucc' : 's',
+'uca' : 's',
+'ucg' : 's',
+
+'uau' : 'y',
+'uac' : 'y',
+'uaa' : '[stop]',
+'uag' : '[stop]',
+
+'ugu' : 'c',
+'ugc' : 'c',
+'uga' : '[stop]',
+'ugg' : 'w',
+
+'cuu' : 'l',
+'cuc' : 'l',
+'cua' : 'l',
+'cug' : 'l',
+
+'ccu' : 'p',
+'ccc' : 'p',
+'cca' : 'p',
+'ccg' : 'p',
+
+'cau' : 'h',
+'cac' : 'h',
+'caa' : 'q',
+'cag' : 'q',
+
+'cgu' : 'r',
+'cgc' : 'r',
+'cga' : 'r',
+'cgg' : 'r',
+
+'auu' : 'i',
+'auc' : 'i',
+'aua' : 'i',
+'aug' : 'm',
+
+'acu' : 't',
+'acc' : 't',
+'aca' : 't',
+'acg' : 't',
+
+'aau' : 'n',
+'aac' : 'n',
+'aaa' : 'k',
+'aag' : 'k',
+
+'agu' : 's',
+'agc' : 's',
+'aga' : 'r',
+'agg' : 'r',
+
+'guu' : 'v',
+'guc' : 'v',
+'gua' : 'v',
+'gug' : 'v',
+
+'gcu' : 'a',
+'gcc' : 'a',
+'gca' : 'a',
+'gcg' : 'a',
+
+'gau' : 'd',
+'gac' : 'd',
+'gaa' : 'e',
+'gag' : 'e',
+
+'ggu' : 'g',
+'ggc' : 'g',
+'gga' : 'g',
+'ggg' : 'g'
+}
+
+function codons2text(cipher) {
+	var output = "";
+	cipher = cipher.toLowerCase().replace(/ /g, "").replace(/t/g, "u"); 
+	for(var j = 0; j < cipher.length; j+=3) {
+		var code = cipher.substring(j, j+3);
+		if(codonsEncoding[code]) {
+			output += codonsEncoding[code];
+		} else {
+			output += "*";
+		}
+	}
+	return output;
+}
+
+var charArray = new Array(
+	' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-',
+	'.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';',
+	'<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+	'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+	'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e',
+	'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+	't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', '', '?', 'ü',
+	'é', 'a', '?', 'à', '?', '?', 'ê', '?', 'è', '?', '?', 'ì', '?', '?',
+	'é', '?', '?', '?', '?', 'ò', '?', 'ù', '?', '?', 'ü', '?', '￡', '?',
+	'×', '?', 'á', 'í', 'ó', 'ú', '?', '?', 'a', 'o', '?', '?', '?', '?',
+	'?', '?', '?', '?', '_', '_', '_', '|', '|', 'á', '?', 'à', '?', '|',
+	'|', '+', '+', '￠', '￥', '+', '+', '-', '-', '+', '-', '+', '?', '?',
+	'+', '+', '-', '-', '|', '-', '+', '¤', 'e', 'D', 'ê', '?', 'è', 'i',
+	'í', '?', '?', '+', '+', '_', '_', '|', 'ì', '_', 'ó', '?', '?', 'ò',
+	'?', '?', 'μ', 't', 'T', 'ú', '?', 'ù', 'y', 'Y', 'ˉ', '′', '-', '±',
+	'_', '?', '?', '§', '÷', '?', '°', '¨', '·', '1', '3', '2', '_', ' ');
+
+asciiSep = " ";
+
+// Convert text into ascii values
+function text2ascii(text) {
+	ascii = "";
+	for (i = 0; i < text.length; i++) {
+		ascii += char2ASCII(text.charAt(i)) + asciiSep;
+	}
+	return ascii;
+}
+
+
+// Convert ascii into text values
+function ascii2text(ascii) {
+	text = "";
+    asciiVals = ascii.split(asciiSep);
+
+	for (av = 0; av < asciiVals.length; av++) {
+		if (asciiVals[av] == "") {
+			continue;
+		}
+		text += ASCII2char(parseInt(asciiVals[av]));
+	}
+	return text;
+}
+
+function char2ASCII(c)
+{
+	var i;
+	for(i=0; i < charArray.length; i++) {
+		if(c == charArray[i]) return i+32;
+	}
+	return 0;
+}
+
+function ASCII2char(n)
+{
+	if(n < 32 || n > 255) return " ";
+	return String.fromCharCode(n);
+//	return charArray[n-32];
+}
+
+
+// Compute all possible Cesaer Cipher values
+function updateCaesar(text) {
+	ret = "";
+	
+	// Stick with lower-case
+	text = text.toLowerCase()
+	
+	for (cipher = 1; cipher < 26; cipher++) {
+		for(letter = 0; letter < text.length; letter++) {
+			theChar = text.charAt(letter);
+			if ((theChar >= 'a' && theChar <= 'z') || (theChar >= 'A' && theChar <= 'Z')) {
+				ascii = char2ASCII(theChar);
+				val = ascii - 97;  // 97 = 'a'
+				val = (val + cipher) % 26;
+				ret += ASCII2char(val + 97);
+			} else {
+				ret += theChar;
+				
+			}
+			
+		}
+		ret += "   " + cipher + "\n";
+	}
+	document.cesaer.cesaers.value = ret;
+}
+var commonSubMaps = [
+'kxvmcnophqrszyijadlegwbuft',
+'qwertyuiopasdfghjklzxcvbnm',
+//'irclufoxajsdmvgpybktenwhqz',
+//'thequickbrownfxjmpsvlazydg',
+//'vigycnzbfphuqmkrdjsaetloxw'
+];
+
+var commonSubDefs = [
+'QWE解密',
+'QWE加密',
+'三进制倒序',
+'敏捷的棕狐狸',
+"敏捷的棕狐狸'"];
+
+// Compute common subs
+function updateCommonSub() {
+	var text = document.commonSubstitution.text.value;
+	var ret = "";
+	// Stick with lower-case
+	text = text.toLowerCase();
+	
+	for (var i in commonSubMaps) {
+		var map = commonSubMaps[i];
+		var cipher = '';
+		for(var j = 0; j < text.length; j++) {
+			var c = text.charAt(j);
+			if(c < 'a' || c > 'z') {
+				cipher += c;
+			} else {
+				cipher += commonSubMaps[i].charAt(char2ASCII(c) - 97);
+			}
+		}
+		ret += (cipher + "\t(" + commonSubDefs[i] + ")\n");
+	}
+	document.commonSubstitution.subs.value = ret;
+}
+
+clearMappings = function() {
+	var save = document.sub.cipher.value;
+	document.sub.reset();
+	document.sub.cipher.value = save;
+	updateSub();
+}
+
+// Update substitution cipher based on currently known vals
+function updateSub() {
+	var index, i;
+	ret = "";
+	text = document.sub.cipher.value;
+	document.sub.cipher.value = text;
+	for (index = 0; index < text.length; index++) {
+		c = text.charAt(index);
+		// if not alphabetical
+		if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))) {
+			ret += c;
+			continue;
+		}
+		var fk;
+		if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+			fk = c.toUpperCase();
+		} else {
+			fk = 'n'+c;
+		}
+		m = document.sub.elements[fk].value;
+		if (m == null || m == '') {
+			ret += "*";
+		} else {
+			if(c >= 'A' && c <= 'Z') {
+				ret += m.toUpperCase();
+			} else {
+				ret += m.toLowerCase();
+			}
+		}
+	}
+	document.sub.text.value = ret;
+	
+	var s = "<table><tr><td>解密：</td>";
+	
+	for (index = 65; index <= 90; index++) {
+		s += "<td>";
+		c = String.fromCharCode(index);
+		ec = document.sub.elements[c].value;
+		if(ec != "") {
+			s += ec.toUpperCase();;
+		} else {
+			s += "*";
+		}
+		s += "</td>";
+	}
+	s += "</tr><tr><td>加密：</td>";
+	for (index = 65; index <= 90; index++) {
+		s += "<td>";
+		c = String.fromCharCode(index);
+		for (i = 65; i <= 90; i++) {
+			ec = String.fromCharCode(i);
+			if(c == document.sub.elements[ec].value.toUpperCase()) {
+				s += ec;
+				break;
+			}
+		}
+		if(i == 91) {
+			s += "*";
+		}
+		s += "</td>";
+	}
+	$("subMappings").innerHTML = s + "</tr></table>";
+}
+
+numSep = "."
+
+
+function defaultNum2Alpha() {
+  for (index = 1; index <= 26; index++) {
+     box = document.numsub.elements["num" + index];
+     box.value = ASCII2char(index + 64);
+  }
+}
+
+
+// Update substitution cipher based on currently known vals
+function updateNumSub() {
+	ret = "";
+	nums = document.numsub.cipher.value.split(numSep);
+	for (nindex = 0; nindex < nums.length; nindex++) {
+		c = nums[nindex];
+		if (c == " ") {
+			ret += ' .';
+			continue;
+		}
+		temp = document.numsub.elements["num" + c];
+		if (temp == null) {
+			continue;
+		}
+		m = temp.value;
+		if (m == null || m == '') {
+			if (c.length == 1) {
+				ret += "*.";
+			} else {
+				ret += "**.";
+			}
+		} else {
+			if (c.length == 1) {
+				ret += m.toUpperCase() + ".";
+			} else {
+				ret += m.toUpperCase() + " .";
+			}
+		}
+        }
+	document.numsub.text.value = ret;
+}
+
+function clearVigenere() {
+	document.vigenere.text.value = "";
+	document.vigenere.key.value = "";
+	document.vigenere.cipher.value = "";
+}
+
+// Update Vigenere with the proper encoding
+function updateVigenere() {
+	var text = document.vigenere.text.value;
+	var key =  document.vigenere.key.value.toLowerCase();
+	
+	if(key == "") {
+		key = document.vigenere.text.value.toLowerCase().replace(/[a-z]/g, '*');
+		document.vigenere.key.value = key;
+	}
+	
+	key = key.replace(/[^a-z*]/g, '');
+	
+	var ret = "";
+
+	if (text.length > 0 && key.length > 0) {
+	  ret = vigenereEncDec(key, text, document.vigenere.mode[0].checked);
+	}
+	document.vigenere.cipher.value = ret;
+}
+
+// autokey
+function autokeyEncDec(key, text, enc) {
+	if(enc) {
+		return vigenereEncDec((key + text).replace(/[^a-z]/g, ''), text, true);
+	}
+
+	// the harder one, to decode
+	// Standardize the input
+	key = key.toLowerCase().replace(/[^a-z]/g, '');
+	text = text.toLowerCase();
+	
+	// key array
+	var keyArray = key.split("");
+	var keyIndex = 0;
+	
+	var ret = "";
+
+	var VEindex;
+	for(VEindex = 0; VEindex < text.length; VEindex++) {
+		// Get the alphabet number (i.e., A=1, B=2, etc.)
+		var textChar = text.charAt(VEindex);
+		var foo = 0;
+		var textAlphaNum = char2ASCII(textChar) - char2ASCII("a");
+		var keyAlphaNum =  char2ASCII(keyArray[keyIndex]) - char2ASCII("a");
+
+		if ( ! (textAlphaNum >= 0 && textAlphaNum < 26) ) {
+		  // It's not a letter of the alphabet, so don't encode it
+		  ret += textChar;
+		  continue;
+		}
+
+		if(key.charAt(keyIndex) == '*') {
+			ret += '*';
+			keyIndex = (keyIndex + 1) % key.length;
+			continue;
+		}
+	
+		var codeAlphaNum = 1;
+		// Calculate the code word's alpha num
+		codeAlphaNum = (textAlphaNum - keyAlphaNum) % 26;
+
+		if (codeAlphaNum < 0) {
+		  codeAlphaNum += 26;
+		}
+		var newKey = letters.charAt(codeAlphaNum);
+		ret += newKey;
+	
+		keyArray[keyIndex] = newKey;
+		
+		// Move to the next key slot
+		keyIndex = (keyIndex + 1) % key.length;
+	}
+	
+	return ret;
+}
+
+// Apply Vigenere Cipher, given a key and a plain text message
+// Enc = 1 will encrypt
+// Enc = 0 will decrypt
+function vigenereEncDec(key, text, enc) {
+  ret = "";
+  keyIndex = 0;
+
+  // Standardize the input
+  key = key.toLowerCase();
+  text = text.toLowerCase();
+
+  // Apply the encryption
+  for (VEindex = 0; VEindex < text.length; VEindex++) {
+		// Get the alphabet number (i.e., A=1, B=2, etc.)
+		var textChar = text.charAt(VEindex);
+		var foo = 0;
+		var textAlphaNum = char2ASCII(textChar) - char2ASCII("a");
+		var keyAlphaNum =  char2ASCII(key.charAt(keyIndex)) - char2ASCII("a");
+
+		if ( ! (textAlphaNum >= 0 && textAlphaNum < 26) ) {
+		  // It's not a letter of the alphabet, so don't encode it
+		  ret += textChar;
+		  continue;
+		}
+
+		if(key.charAt(keyIndex) == '*') {
+			ret += '*';
+			keyIndex = (keyIndex + 1) % key.length;
+			continue;
+		}
+	
+		var codeAlphaNum = 1;
+		// Calculate the code word's alpha num
+		if (enc) {
+		  codeAlphaNum = (textAlphaNum + keyAlphaNum) % 26;
+		} else {
+		  codeAlphaNum = (textAlphaNum - keyAlphaNum) % 26;
+		}
+
+		if (codeAlphaNum < 0) {
+		  codeAlphaNum += 26;
+		}
+		ret += letters.charAt(codeAlphaNum);
+	
+
+		// Move to the next key slot
+		keyIndex = (keyIndex + 1) % key.length;
+	}
+
+	return ret;
+}
+
+
+</SCRIPT>
+
+	<META content="MSHTML 6.00.2900.5969" name=GENERATOR>
+</HEAD>
+
+<BODY>
+	<TABLE width=350 align=center>
+		<TBODY>
+			<TR>
+				<TD>
+					<CENTER>
+						<H3 style="MARGIN-BOTTOM: 0px">不暴力不成活</H3>
+					</CENTER>
+					<UL style="MARGIN-TOP: 5px; LINE-HEIGHT: 18pt">
+						<LI>Adapted from <A href="http://www.ece.cmu.edu/~bparno/puzzle.html">Bryan Parno's Puzzle
+								Calculator</A>
+						<LI>推荐跟<A href="http://meiyou.org/gongju/mimacode.htm">密码机器</A>配套使用。
+						</LI>
+					</UL>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+	<TABLE cellPadding=10 width=900 align=center border=2>
+		<TBODY>
+			<TR>
+				<TD><A name=zy>
+						<P align=center>资源整理
+							<P>
+					</A>
+					<DIV style="MARGIN: 0px 70px">
+						<UL>
+							<TABLE
+								style="BORDER-RIGHT: #eeffdd 4px solid; BORDER-TOP: #eeffdd 4px solid; BORDER-LEFT: #eeffdd 4px solid; BORDER-BOTTOM: #eeffdd 4px solid"
+								cellPadding=3>
+								<TBODY>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A href="http://rumkin.com/tools/cipher/">基本工具</A></TD>
+										<TD>其实这里最好用的是那个 Vigenere Autokey，其它的要么已经有了，要么过于偏僻</TD>
+									</TR>
+									<TR vAlign=top>
+										<TD><A
+												href="http://www.unitconversion.org/unit_converter/numbers.html">2-36进制转换</A>
+										</TD>
+										<TD></TD>
+									</TR>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A
+												href="http://www.purplehell.com/riddletools/applets/cryptogram.htm">乱序暴力</A>
+										</TD>
+										<TD>可以自动解英文且含空格的单表替换</TD>
+									</TR>
+									<TR vAlign=top>
+										<TD><A href="http://inter.scoutnet.org/semaphore/">明文 → 旗语</A></TD>
+										<TD>把明文换成图案形式的旗语（就是一小人举俩旗子），还可以自动生成连续的 GIF 动画。</TD>
+									</TR>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A href="http://dianma.org/">中文电码自动转换</A></TD>
+										<TD>最赞的是可以同时转换多个字/编码……</TD>
+									</TR>
+									<TR vAlign=top>
+										<TD><A href="http://www.photius.com/flags/flag_identifier.html">国旗反查询</A></TD>
+										<TD>通过选择国旗的样子（例如形状，图案，主要颜色）查出对应的国家</TD>
+									</TR>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A href="http://tool.114la.com/base64.html">Base 64</A></TD>
+										<TD></TD>
+									</TR>
+									<TR vAlign=top>
+										<TD><A href="http://www.xmd5.org/">MD5</A></TD>
+										<TD>可以逆一些常见的 MD5</TD>
+									</TR>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A href="http://info.52z.com/html/24280.html">五笔编码</A></TD>
+										<TD></TD>
+									</TR>
+									<TR vAlign=top>
+										<TD><A href="http://www.yuzi.net/tool/Import.htm">五笔 → 汉字</A></TD>
+										<TD></TD>
+									</TR>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A href="http://wbic16.xedoloh.com/dvorak.html">QWERTY &#8596;
+												DVORAK</A></TD>
+										<TD></TD>
+									</TR>
+									<TR vAlign=top>
+										<TD><A
+												href="http://www.bluebit.gr/matrix-calculator/matrix_multiptdcation.aspx">矩阵乘法</A>
+										</TD>
+										<TD></TD>
+									</TR>
+									<TR vAlign=top bgColor=#eeffdd>
+										<TD><A href="http://www.motionnet.com/calculator/">计算器</A></TD>
+										<TD>可以对数字进行 or, and, xor, not 这样的位运算</TD>
+									</TR>
+								</TBODY>
+							</TABLE>
+						</UL>
+					</DIV>
+					<HR>
+					<A name=sz>
+						<P align=center>数字转换
+							<P>
+					</A>
+					<FORM name=numbers>
+						<TABLE align=center>
+							<TBODY>
+								<TR>
+									<TD>十进制</TD>
+									<TD><INPUT onchange=updateNum(this.value); size=80 name=decimal></TD>
+								</TR>
+								<TR>
+									<TD>二进制</TD>
+									<TD><INPUT onchange=updateNum(bin2dec(this.value)); size=80 name=binary></TD>
+								</TR>
+								<TR>
+									<TD><SELECT onchange=updateNum(document.numbers.decimal.value) name=toBase>
+											<OPTION value=3 selected>3</OPTION>
+											<OPTION value=4>4</OPTION>
+											<OPTION value=5>5</OPTION>
+											<OPTION value=6>6</OPTION>
+											<OPTION value=7>7</OPTION>
+											<OPTION value=8>8</OPTION>
+											<OPTION value=9>9</OPTION>
+										</SELECT> 进制</TD>
+									<TD><INPUT onchange="updateNum(vXto10(document.numbers.toBase.value, this.value))"
+											size=80 name=toBaseS></TD>
+								</TR>
+								<TR>
+									<TD>十六进制</TD>
+									<TD><INPUT onchange=updateNum(hex2dec(this.value)); size=80 name=hex></TD>
+								</TR>
+								<TR>
+									<TD>莫尔斯</TD>
+									<TD><INPUT onchange=updateNum(morse2text(this.value)); size=80 name=morse></TD>
+								</TR>
+								<TR>
+									<TD>1=!, 2=@……</TD>
+									<TD><INPUT onchange=updateNum(sym2dec(this.value)); size=80 name=symbols></TD>
+								</TR>
+								<TR>
+									<TD>1=H, 2=He……</TD>
+									<TD><INPUT onchange=updateNum(ele2dec(this.value)); size=80 name=elements></TD>
+								</TR>
+								<TR>
+									<TD align=middle colSpan=2>单方向解：</TD>
+								</TR>
+								<TR>
+									<TD>字母序</TD>
+									<TD><INPUT size=80 name=seqS></TD>
+								</TR>
+								<TR>
+									<TD>ASCII</TD>
+									<TD><INPUT size=80 name=ASCIIS></TD>
+								</TR>
+								<TR>
+									<TD>键盘1q</TD>
+									<TD><INPUT size=80 name=keyboardS></TD>
+								</TR>
+								<TR>
+									<TD>键盘1z</TD>
+									<TD><INPUT size=80 name=keyboardS2></TD>
+								</TR>
+								<TR>
+									<TD>大小键盘</TD>
+									<TD><INPUT size=80 name=dKeyboardS></TD>
+								</TR>
+								<TR>
+									<TD>V字</TD>
+									<TD><INPUT size=80 name=VS></TD>
+								</TR>
+								<TR>
+									<TD>手机</TD>
+									<TD><INPUT size=80 name=cellphoneS></TD>
+								</TR>
+								<TR>
+									<TD>手机（简）</TD>
+									<TD><TEXTAREA name=cellphoneP rows=4 cols=80></TEXTAREA></TD>
+								</TR>
+							</TBODY>
+						</TABLE>
+					</FORM>
+					<HR>
+					<A name=ywzm>
+						<P align=center>英文字母转换</P>
+					</A>
+					<FORM name=strings>
+						<TABLE align=center>
+							<TBODY>
+								<TR>
+									<TD>英文字符串</TD>
+									<TD><INPUT onchange=updateStr(this.value); size=80 name=text> </TD>
+								</TR>
+								<TR>
+									<TD>倒序</TD>
+									<TD><INPUT onchange=updateStr(strrev(this.value)); size=80 name=rev>
+									</TD>
+								</TR>
+								<TR>
+									<TD>ASCII</TD>
+									<TD><INPUT onchange=updateStr(ascii2text(this.value)); size=80 name=ascii></TD>
+								</TR>
+								<TR>
+									<TD>莫尔斯</TD>
+									<TD><INPUT onchange=onchangeMorse(this.value); size=80 name=morse></TD>
+								</TR>
+								<TR>
+									<TD>莫尔斯'（单方向）</TD>
+									<TD><INPUT size=80 name=morse2></TD>
+								</TR>
+								<TR>
+									<TD>A=1，B=2……（模26）</TD>
+									<TD><INPUT onchange=updateStr(seq2text(this.value)); size=80 name=seq></TD>
+								</TR>
+								<TR>
+									<TD>A=Z，B=Y……</TD>
+									<TD><INPUT onchange=updateStr(atbash2text(this.value)); size=80 name=atbash></TD>
+								</TR>
+								<TR>
+									<TD>手机（A=21，B=22）</TD>
+									<TD><INPUT onchange=updateStr(cellphone2text(this.value)); size=80 name=cellphone>
+									</TD>
+								</TR>
+								<TR>
+									<TD>键盘（A=12，B=53）</TD>
+									<TD><INPUT onchange=updateStr(keyboard2text(this.value)); size=80 name=keyboard>
+									</TD>
+								</TR>
+								<TR>
+									<TD>传说中的V</TD>
+									<TD><INPUT onchange=updateStr(v2text(this.value)); size=80 name=vTip></TD>
+								</TR>
+								<TR>
+									<TD>■△▲※软键盘</TD>
+									<TD><INPUT onchange=updateStr(softkey2text(this.value)); size=80 name=softkey></TD>
+								</TR>
+								<TR>
+									<TD>旗语（上2下8左4右6）</TD>
+									<TD><INPUT onchange=updateStr(semaphore2text(this.value)); size=80 name=semaphore>
+									</TD>
+								</TR>
+								<TR>
+									<TD>A=GC[UTCAG]……（单方向）</TD>
+									<TD><INPUT onchange=updateStr2(codons2text(this.value)); size=80 name=codons></TD>
+								</TR>
+							</TBODY>
+						</TABLE>
+					</FORM>
+					<HR>
+					<A name=ks>
+						<FORM name=cesaer>
+							<TABLE align=center>
+								<TBODY>
+									<TR>
+										<TD>英文字符串</TD>
+										<TD><INPUT onchange=updateCaesar(this.value); size=80 name=text>
+										</TD>
+									</TR>
+									<TR>
+										<TD>凯撒移位</TD>
+										<TD><TEXTAREA name=cesaers rows=27 cols=80></TEXTAREA></TD>
+									</TR>
+								</TBODY>
+							</TABLE>
+						</FORM>
+						<HR>
+						<A name=mw></A>
+						<FORM name=braille>
+							<SCRIPT type=text/javascript>
+var brailleCodes = [
+	'      ',
+	'.     ',
+	'. .   ',
+	'..    ',
+	'.. .  ',
+	'.  .  ',
+	'...   ',
+	'....  ',
+	'. ..  ',
+	' ..   ',
+	' ...  ',
+	'.   . ',
+	'. . . ',
+	'..  . ',
+	'.. .. ',
+	'.  .. ',
+	'... . ',
+	'..... ',
+	'. ... ',
+	' .. . ',
+	' .... ',
+	'.   ..',
+	'. . ..',
+	' ... .',
+	'..  ..',
+	'.. ...',
+	'.  ...',
+	// symbols
+	'    . ',
+	'  .. .',
+	'  .   ',
+	'  . . ',
+	'  ... ',
+	'  . ..',
+	'    ..'
+];
+
+var brailleText = " abcdefghijklmnopqrstuvwxyz'.,;!?-";
+
+function encodeBraille() {
+	var input = document.braille.text.value.toLowerCase();
+	var o1 = '', o2 = '', o3 = '';
+	var o1d = '', o2d = '', o3d = '';
+	for(var i = 0; i < input.length; i++) {
+		var id;
+		var bcode;
+		var bcodeDisplay;
+		if(input.charAt(i) == '.') {
+			id = brailleText.search(/\./);
+		} else if(input.charAt(i) == '?') {
+			id = brailleText.search(/\?/);
+		} else {
+			id = brailleText.search(input.charAt(i));
+		}
+		if(id == -1) {
+			bcode = "??????";
+		} else {
+			bcodeDisplay = brailleCodes[id].replace(/ /g,'○').replace(/\./g,'●');
+			bcode = brailleCodes[id];
+		}
+		o1 += bcode.substring(0, 2);
+		o2 += bcode.substring(2, 4);
+		o3 += bcode.substring(4, 6);
+		o1d += bcodeDisplay.substring(0, 2) + ' ';
+		o2d += bcodeDisplay.substring(2, 4) + ' ';
+		o3d += bcodeDisplay.substring(4, 6) + ' ';
+	}
+	document.braille.braille.value = o1 + '\n' + o2 + '\n' + o3;
+	$("prettyBraille").innerHTML = (o1d + '<br/>' + o2d + '<br/>' + o3d).replace(/○/g,'<font color="#ddd">○</font>');
+}
+
+function decodeBraille() {
+	var input = document.braille.braille.value.split('\n');
+	var i1 = input[0], i2 = input[1], i3 = input[2];
+	
+	var length = Math.min(i1.length, Math.min(i2.length, i3.length));
+	if(length % 2 == 1) {
+		length = length - 1;
+	}
+	
+	var output = '';
+	for(var i = 0; i < length; i+=2) {
+		var bcode = '';
+		bcode += (i1.substring(i, i+2) + i2.substring(i, i+2) + i3.substring(i, i+2));
+		for(var j = 0; j < brailleCodes.length; j++) {
+			if(bcode == brailleCodes[j]) {
+				break;
+			}
+		}
+		if(j == brailleCodes.length) {
+			output += "*";
+		} else {
+			output += brailleText.charAt(j);
+		}
+	}
+	document.braille.text.value = output;
+}
+
+bsToggle = function(i) {
+	curI = $("bs" + i);
+	if(curI.innerHTML == "●") {
+		curI.innerHTML = "○";
+	} else {
+		curI.innerHTML = "●";
+	}
+	var bsS = "";
+	for(var i = 1;i <= 6; i++) {
+		if($("bs" + i).innerHTML == "●") {
+			bsS += '.';
+		} else {
+			bsS += ' ';
+		}
+	}
+	
+	for(var j = 0; j < brailleCodes.length; j++) {
+		if(bsS == brailleCodes[j]) {
+			break;
+		}
+	}
+	if(j == brailleCodes.length) {
+		$("brailleSingleDisplay").innerHTML = "错误";
+	} else {
+		$("brailleSingleDisplay").innerHTML = brailleText.charAt(j);
+	}
+}
+
+</SCRIPT>
+
+							<P align=center>盲文。输入须知：三行，无间隔符号，“.”和空格“ ”。每个字母务必补全6字符。</P>
+							<P style="FONT-SIZE: 24pt; FONT-FAMILY: 宋体" align=center><SPAN id=bs1
+									onclick=bsToggle(1)>●</SPAN><SPAN id=bs2 onclick=bsToggle(2)>○</SPAN>
+								<BR><SPAN id=bs3 onclick=bsToggle(3)>○</SPAN><SPAN id=bs4 onclick=bsToggle(4)>○</SPAN>
+								<BR><SPAN id=bs5 onclick=bsToggle(5)>○</SPAN><SPAN id=bs6 onclick=bsToggle(6)>○</SPAN>
+								<BR><SPAN id=brailleSingleDisplay>a</SPAN>
+							</P>
+							<TABLE cellPadding=5 align=center>
+								<TBODY>
+									<TR>
+										<TD>英文字母</TD>
+										<TD><INPUT onchange=encodeBraille(); size=80 name=text> </TD>
+									</TR>
+									<TR>
+										<TD>盲文</TD>
+										<TD><TEXTAREA name=braille rows=3 cols=80 onchange=decodeBraille()></TEXTAREA>
+										</TD>
+									</TR>
+									<TR>
+										<TD>排版显示</TD>
+										<TD>
+											<DIV id=prettyBraille style="FONT-FAMILY: 宋体"></DIV>
+										</TD>
+									</TR>
+								</TBODY>
+							</TABLE>
+						</FORM>
+						<HR>
+						<A name=cjtd>
+							<FORM name=commonSubstitution>
+								<TABLE align=center>
+									<TBODY>
+										<TR>
+											<TD>英文字符串</TD>
+											<TD><INPUT onchange=updateCommonSub(); size=80 name=text> </TD>
+										</TR>
+										<TR>
+											<TD>QWE</TD>
+											<TD><TEXTAREA name=subs rows=5 cols=80></TEXTAREA></TD>
+										</TR>
+									</TBODY>
+								</TABLE>
+							</FORM>
+							<HR>
+							<A name=polybius>
+								<P align=center>Polybius
+									<P>
+									<FORM name=Poly>
+										<SCRIPT type=text/javascript>
+function getPolybiusKey() {
+	var key = document.Poly.polybiusKey.value.toLowerCase();
+	key = key.replace("j", "i");
+	var i;
+	
+	for (i=0; i<26; i++) {
+		if(i != 9) {
+			var c = String.fromCharCode(i+97);	
+			if(!key.match(c)) {
+				key += c;
+			}
+		}
+	}
+	return key;
+}
+
+function updatePolybius() {
+	var key = getPolybiusKey();
+	
+	var chars1 = document.Poly.key1.value.toLowerCase();
+	var chars2 = document.Poly.key2.value.toLowerCase();
+	
+	if(key.length == 25 && chars1.length == 5 && chars2.length == 5) {
+		var cipher = document.Poly.cipher.value.toLowerCase().replace(/[^a-z]/g, '');
+		var decoded = "";
+		for(var j = 0; j < cipher.length; j+=2) {
+			var char1 = cipher.charAt(j);
+			var char2 = cipher.charAt(j+1);
+			var index1 = -1, index2 = -1;
+			for(var k = 0; k < 5; k++) {
+				if(chars1.charAt(k) == char1) {
+					index1 = k;
+				}
+				if(chars2.charAt(k) == char2) {
+					index2 = k;
+				}
+			}
+			if(index1 < 0 || index2 < 0) {
+				decoded += "*";
+			} else {
+				decoded += key.charAt(5*index1+index2);
+			}
+		}
+		document.Poly.text.value = decoded;
+	} else {
+		alert("invalid key");
+	}
+}
+
+encodePolybius = function() {
+	var key = getPolybiusKey();
+	
+	var chars1 = document.Poly.key1.value.toLowerCase();
+	var chars2 = document.Poly.key2.value.toLowerCase();
+	
+	if(key.length == 25 && chars1.length == 5 && chars2.length == 5) {
+		var plaintext = document.Poly.text.value.toLowerCase().replace("j", "i");
+		
+		var encoded = "";
+		for(var j = 0; j < plaintext.length; j++) {
+			var c = plaintext.charAt(j);
+			
+			var i;
+			for(i = 0; i < 25; i++) {
+				if(key.charAt(i) == c) {
+					break;
+				}
+			}
+			
+			if(i == 25) {
+				encoded += c;
+			} else {			
+				var char1 = chars1.charAt(Math.floor(i / 5));
+				var char2 = chars2.charAt(i % 5);
+				
+				encoded += (char1 + char2);
+			}
+		}
+		document.Poly.cipher.value = encoded;
+	} else {
+		alert("invalid key");
+	}
+}
+
+</SCRIPT>
+
+										<TABLE>
+											<TBODY>
+												<TR>
+													<TD>密文</TD>
+													<TD><INPUT onchange=updatePolybius(); size=80 name=cipher></TD>
+												</TR>
+												<TR>
+													<TD>明文</TD>
+													<TD><INPUT onchange=encodePolybius() size=80 name=text></TD>
+												</TR>
+												<TR>
+													<TD>密钥</TD>
+													<TD><INPUT onchange=updatePolybius(); name=polybiusKey></TD>
+												</TR>
+												<TR>
+													<TD>第一字母</TD>
+													<TD><INPUT onchange=updatePolybius(); value=abcde name=key1></TD>
+												</TR>
+												<TR>
+													<TD>第二字母</TD>
+													<TD><INPUT onchange=updatePolybius(); value=vwxyz name=key2></TD>
+												</TR>
+											</TBODY>
+										</TABLE>
+									</FORM>
+									<HR>
+									<A name=wjny>
+										<P align=center>维吉尼亚：明文＋密钥＝密文
+											<P>
+											<FORM name=vigenere>
+												<TABLE width=650 align=center>
+													<TBODY>
+														<TR>
+															<TD width=70>模式</TD>
+															<TD><INPUT type=radio onchange=updateVigenere();
+																	value=Encrypt name=mode>加 <INPUT type=radio
+																	onchange=updateVigenere(); value=Decrypt name=mode>减
+																<INPUT onclick=clearVigenere(); type=button value=Clear>
+															</TD>
+														</TR>
+														<TR>
+															<TD width=70>Input 1</TD>
+															<TD><INPUT onchange=updateVigenere(); size=80 name=text>
+															</TD>
+														</TR>
+														<TR>
+															<TD width=70>Input2</TD>
+															<TD><INPUT onkeyup=updateVigenere(); size=80 name=key> </TD>
+														</TR>
+														<TR>
+															<TD width=70>Output:</TD>
+															<TD><INPUT onchange=; size=80 name=cipher>
+															</TD>
+														</TR>
+			</TR>
+		</TBODY>
+	</TABLE>
+	</FORM>
+	<HR>
+
+	<FORM name=vigenereBruteForce>
+		<SCRIPT type=text/javascript>
+
+function sortNumber(a,b)
+{
+return b-a;
+}
+
+var standardFreqEn = [8.167, 1.492, 2.782, 4.253, 12.702, 2.228, 2.015, 
+			6.094, 6.966, 0.153, 0.772, 4.025, 2.406, 6.749,
+			7.507, 1.929, 0.095, 5.987, 6.327, 9.056, 
+			2.758, 0.978, 2.36, 0.15, 1.974, 0.074];
+
+var sortedStandardFreqEn = [8.167, 1.492, 2.782, 4.253, 12.702, 2.228, 2.015, 
+			6.094, 6.966, 0.153, 0.772, 4.025, 2.406, 6.749,
+			7.507, 1.929, 0.095, 5.987, 6.327, 9.056, 
+			2.758, 0.978, 2.36, 0.15, 1.974, 0.074];
+
+var standardFreqCn = [8.22, 1.43, 0.68, 2.57, 6.35, 1.22, 9.50,
+			5.6, 12.93, 2.3, 0.2, 0.66, 0.86, 12.56,
+			7.02, 0.68, 0.62, 0.84, 2.24, 1.8,
+			9.4, 0, 1.86, 1.16, 5.52, 3.2];
+
+var sortedStandardFreqCn = [8.22, 1.43, 0.68, 2.57, 6.35, 1.22, 9.50,
+			5.6, 12.93, 2.3, 0.2, 0.66, 0.86, 12.56,
+			7.02, 0.68, 0.62, 0.84, 2.24, 1.8,
+			9.4, 0, 1.86, 1.16, 5.52, 3.2];
+
+var standardFreq, sortedStandardFreq;
+			
+sortedStandardFreqEn.sort(sortNumber);			
+sortedStandardFreqCn.sort(sortNumber);
+
+get_guessKey = function() {
+	var guessKey = '';
+	var l = parseInt($('vig_len').value);
+	for (var i = 0; i < l; i++) {
+		guessKey += $('vig_key' + i).value;
+	}
+	return guessKey;
+}
+
+vig_opt_dp = function() {
+	if(document.vigenereBruteForce.vigL[1].checked) {
+		standardFreq = standardFreqCn;
+		sortedStandardFreq = sortedStandardFreqCn;
+	} else {
+		standardFreq = standardFreqEn;
+		sortedStandardFreq = sortedStandardFreqEn;
+	}
+	var l = parseInt($('vig_len').value);
+	var count = new Array(26); // array to store count of each letter
+
+	var ret = $('vig_input').value;
+	ret = ret.toLowerCase().replace(/[^a-z]/g, '');
+
+	for(var j = 0; j < l; j++) {
+
+		for (i=0; i<26; i++) {
+			count[i] = 0;
+		}
+
+		for(i = j; i < ret.length; i+= l) {
+			var c = ret.charAt(i);
+			count[char2ASCII(c) - 97]+=1.0;
+		}
+
+		var max_dp = -1000000000;
+		var best_i = 0;
+
+		for (i=0; i<26; i++) {
+			var cur_dp = 0.0;
+			for(var k = 0; k < 26; k++) {
+				cur_dp += standardFreq[k] * count[(k + i) % 26];
+			}
+
+			if(cur_dp > max_dp) {
+				max_dp = cur_dp;
+				best_i = i;
+			}
+		}
+
+		$('vig_key' + j).value = ASCII2char(97+best_i);
+	}
+	update_vig_guess();
+}
+
+
+vig_full = function() {
+	if(document.vigenereBruteForce.vigL[1].checked) {
+		standardFreq = standardFreqCn;
+		sortedStandardFreq = sortedStandardFreqCn;
+	} else {
+		standardFreq = standardFreqEn;
+		sortedStandardFreq = sortedStandardFreqEn;
+	}
+	
+	var best_key, best_len;
+	var max_score = -100000000;
+	var count = new Array(26); // array to store count of each letter
+	var cipher = $('vig_input').value;
+	cipher = cipher.toLowerCase().replace(/[^a-z]/g, '');
+
+	for(var len = 3; len <= 12; len++) {
+		var key = '';
+
+		for(var j = 0; j < len; j++) {
+
+			for (var i=0; i<26; i++) {
+				count[i] = 0;
+			}
+
+			for(var i = j; i < cipher.length; i+= len) {
+				var c = cipher.charAt(i);
+				count[char2ASCII(c) - 97]+=1.0;
+			}
+
+			var max_dp = -1000000000;
+			var best_i = 0;
+
+			for (var i=0; i<26; i++) {
+				var cur_dp = 0.0;
+				for(var k = 0; k < 26; k++) {
+					cur_dp += standardFreq[k] * count[(k + i) % 26];
+				}
+
+				if(cur_dp > max_dp) {
+					max_dp = cur_dp;
+					best_i = i;
+				}
+			}
+
+			key += ASCII2char(97+best_i);
+			
+		}
+
+		var deciphered = vigenereEncDec(key, cipher, false);
+
+		for (var i=0; i<26; i++) {
+			count[i] = 0;
+		}
+
+		for(i = 0; i < deciphered.length; i++) {
+			var c = deciphered.charAt(i);
+			count[char2ASCII(c) - 97]+=1.0;
+		}
+
+		var cur_score = 0.0;
+		for(var k = 0; k < 26; k++) {
+			cur_score += standardFreq[k] * count[k];
+		}
+
+		if(cur_score > max_score) {
+			max_score = cur_score;
+			best_len = len;
+			best_key = key;
+		}	
+	}
+	$('vig_len').value = best_len;
+	updateVigLen(best_key);	
+}
+
+auto_full = function() {
+	if(document.autokeyBruteForce.autoL[1].checked) {
+		standardFreq = standardFreqCn;
+		sortedStandardFreq = sortedStandardFreqCn;
+	} else {
+		standardFreq = standardFreqEn;
+		sortedStandardFreq = sortedStandardFreqEn;
+	}
+	
+	var best_key, best_len;
+	var max_score = -100000000;
+	var count = new Array(26); // array to store count of each letter
+	var ocipher = $('auto_input').value;
+	cipher = ocipher.toLowerCase().replace(/[^a-z]/g, '');
+
+	for(var len = 1; len <= 12; len++) {
+		var key = '';
+
+		for(var j = 0; j < len; j++) {
+
+			var max_dp = -1000000000;
+			var best_l = 0;
+
+			for(var l = 0; l < 26; l++) {
+				for (var i=0; i<26; i++) {
+					count[i] = 0;
+				}
+			
+				// initialize key
+				var innerKey = l;
+				for(var i = j; i < cipher.length; i+= len) {
+					innerKey = (char2ASCII(cipher.charAt(i)) - 97 - innerKey + 26) % 26;
+					count[innerKey]+=1.0;
+				}
+
+				for (var i=0; i<26; i++) {
+					var cur_dp = 0.0;
+					for(var k = 0; k < 26; k++) {
+						cur_dp += standardFreq[k] * count[k];
+					}
+
+					if(cur_dp > max_dp) {
+						max_dp = cur_dp;
+						best_l = l;
+					}
+				}
+			}
+
+			key += ASCII2char(97+best_l);
+		}
+
+		var deciphered = autokeyEncDec(key, cipher, false);
+
+		for (var i=0; i<26; i++) {
+			count[i] = 0;
+		}
+
+		for(i = 0; i < deciphered.length; i++) {
+			var c = deciphered.charAt(i);
+			count[char2ASCII(c) - 97]+=1.0;
+		}
+
+		var cur_score = 0.0;
+		for(var k = 0; k < 26; k++) {
+			cur_score += standardFreq[k] * count[k];
+		}
+
+		if(cur_score > max_score) {
+			max_score = cur_score;
+			best_len = len;
+			best_key = key;
+		}	
+	}
+	$('auto_currentKey').innerHTML = '<b>' + best_key + '</b>';
+	$('auto_result').innerHTML = autokeyEncDec(best_key, ocipher, false);
+}
+
+vig_move = function(j, dir) {
+	var curK = $('vig_key' + j).value;
+	var newK = ASCII2char(97 + ((char2ASCII(curK) - 97 + dir + 26) % 26));
+	$('vig_key' + j).value = newK;
+	update_vig_guess();
+}
+update_vig_guess = function() {
+	if(document.vigenereBruteForce.vigL[1].checked) {
+		standardFreq = standardFreqCn;
+		sortedStandardFreq = sortedStandardFreqCn;
+	} else {
+		standardFreq = standardFreqEn;
+		sortedStandardFreq = sortedStandardFreqEn;
+	}
+
+	var l = parseInt($('vig_len').value);
+
+	var guessKey = get_guessKey();
+
+	var ret = vigenereEncDec(guessKey, $('vig_input').value, false);
+	$('vig_result').innerHTML = ret;
+	$('vig_currentKey').innerHTML = '<b>' + guessKey + '</b>';
+	ret = ret.toLowerCase().replace(/[^a-z]/g, '');
+	var alpha = new Array(26); // alphabet array
+	var count = new Array(26); // array to store count of each letter
+	var sorted = new Array(26); // array to store count of each letter
+	var countRes = "<table><tr><td></td>";
+	for (i=0; i<26; i++) {
+		alpha[i] = ASCII2char(i + 97);
+		countRes += ("<td width='35'>" + alpha[i] + "</td>");
+	}
+	countRes+="<td></td></tr>";
+	for(var j = 0; j < l; j++) {
+		countRes += ("<tr><td><input type='button' value='<' onclick='vig_move(" + j + ", 1)'></td>");
+		for (i=0; i<26; i++) {
+			count[i] = 0;
+		}
+		for(i = j; i < ret.length; i+= l) {
+			var c = ret.charAt(i);
+			count[char2ASCII(c) - char2ASCII('a')]++;
+		}
+		for (i=0; i<26; i++) {
+			sorted[i] = count[i];
+		}
+		sorted.sort(sortNumber);
+		for (i=0; i<26; i++) {
+			if(count[i] <= sorted[23]) {
+				countRes += ("<td class='red'>" + count[i] + "</td>");
+			}
+			else if(count[i] >= sorted[2]) {
+				countRes += ("<td class='green'>" + count[i] + "</td>");
+			} else {
+				countRes += ("<td>" + count[i] + "</td>");
+			}
+		}
+		countRes+="<td><input type='button' value='>' onclick='vig_move(" + j + ", -1)'></td></tr>";
+	}
+
+	countRes+="<tr><td></td>";
+	for (var i=0; i<26; i++) {
+		var psf = Math.round(standardFreq[i] * 10) / 10.0;
+		if(standardFreq[i] <= sortedStandardFreq[23]) {
+			countRes += ("<td class='red'>" + psf + "</td>");
+		}
+		else if(standardFreq[i] >= sortedStandardFreq[2]) {
+			countRes += ("<td class='green'>" + psf + "</td>");
+		} else {
+			countRes += ("<td>" + psf + "</td>");
+		}
+	}
+	countRes+="</tr></table><input type='button' onclick='vig_opt_dp()' value='点积最大化'>";
+
+	$('vig_testFreq').innerHTML = countRes;
+}
+
+updateVigLen = function(key) {
+	var l = parseInt($('vig_len').value);
+	var ks = '';
+	for (var i = 0; i < l; i++) {
+		var kk;
+		if(typeof key == "undefined") {
+			kk = 'a';
+		} else {
+			kk = key.charAt(i);
+		}
+		var k = "<select  onchange='update_vig_guess()' id='vig_key" + i + "'>";
+		for(var j = 97; j <= 122; j++) {
+			k+= "<option value='" + ASCII2char(j) + "'";
+			if(ASCII2char(j) == kk) {
+				k+= " selected='selected'";
+			}
+			k+= ">" + ASCII2char(j) + "</option>";
+		}
+		k+= "</select>";
+		ks+=k;
+	}
+	$("vig_testKey").innerHTML = ks;
+	update_vig_guess();
+}
+</SCRIPT>
+
+		<P align=center>维吉尼亚：暴力版</P>
+		<TABLE>
+			<TBODY>
+				<TR>
+					<TD colSpan=2><INPUT type=radio value=En name=vigL>英文 <INPUT type=radio value=Cn name=vigL>拼音 </TD>
+				</TR>
+				<TR>
+					<TD>密文（仅限英文字母）：</TD>
+					<TD id=vig_currentKey>
+					<TD></TD>
+				<TR vAlign=top>
+					<TD><TEXTAREA id=vig_input name=vig_input rows=15 cols=50></TEXTAREA></TD>
+					<TD id=vig_result></TD>
+				</TR>
+			</TBODY>
+		</TABLE>密钥长度：<INPUT id=vig_len size=10><INPUT onclick=updateVigLen() type=button value=Update> <INPUT
+			onclick=vig_full() type=button value="Guess 3-12 (best in FF)">
+		<DIV id=vig_testKey></DIV>
+		<DIV id=vig_testFreq></DIV>
+	</FORM>
+	<HR>
+	<A name=auto>
+		<P align=center>Autokey 暴力破译
+			<P>
+			<FORM name=autokeyBruteForce>
+				<TABLE>
+					<TBODY>
+						<TR>
+							<TD colSpan=2><INPUT type=radio value=En name=autoL>英文 <INPUT type=radio value=Cn
+									name=autoL>拼音 </TD>
+						</TR>
+						<TR>
+							<TD>密文（仅限英文字母）：</TD>
+							<TD id=auto_currentKey>
+							<TD></TD>
+						<TR vAlign=top>
+							<TD><TEXTAREA id=auto_input name=auto_input rows=15 cols=50></TEXTAREA></TD>
+							<TD id=auto_result></TD>
+						</TR>
+					</TBODY>
+				</TABLE><INPUT onclick=auto_full() type=button value="Guess 1-12">
+			</FORM>
+			<HR>
+			<A name=zspl>
+				<P align=center>字数频率
+					<P>
+					<TABLE>
+						<TBODY>
+							<TR vAlign=top>
+								<TD>
+									<FORM name=countfreq><TEXTAREA id=input name=input rows=20
+											cols=50></TEXTAREA><BR><INPUT onclick="alphaFrequency(); return false;"
+											type=submit value=字频 name=button>
+										<INPUT onclick="wordFrequency(); return false;" type=submit value=词频（空格分开）
+											name=button>
+										<INPUT type=checkbox name=count2> 2 <INPUT type=checkbox name=count3> 3
+									</FORM>
+								</TD>
+								<TD width=60>
+									<PRE id=results></PRE>
+								</TD>
+								<TD width=60>
+									<PRE id=resultsOrderedByFrequency></PRE>
+								</TD>
+								<TD width=60>
+									<PRE id=results2></PRE>
+								</TD>
+								<TD width=60>
+									<PRE id=results3></PRE>
+								</TD>
+								<TD>
+									<DIV id=resultsw></DIV>
+								</TD>
+							</TR>
+						</TBODY>
+					</TABLE>
+					<HR>
+
+					<SCRIPT type=text/javascript>
+	function countBigram() {
+		var text = document.bigram.input.value.replace(/\s/g,"");
+		var count = {};
+		var secondTotal = {};
+		for(var j = 0; j < text.length - 1; j+=2) {
+			var c1 = text.charAt(j);
+			var c2 = text.charAt(j+1);
+			
+			if(!count[c1]) {
+				count[c1] = {};
+			}
+			if(!count[c1][c2]) {
+				count[c1][c2] = 0;
+			}
+			count[c1][c2]++;
+			
+			if(!secondTotal[c2]) {
+				secondTotal[c2] = 0;
+			}
+			secondTotal[c2]++;
+		}
+		
+		var ret = '<table class="bigram" cellspacing="0" cellpadding="5"><tr><td></td>';
+		
+		var fixedOrder2 = new Array();
+		for (var c2 in secondTotal) {
+			ret += ('<td><b>'+c2+'</b></td>');
+			fixedOrder2.push(c2);
+		}
+		ret += '<td class="rSum"><b>总</b></td></tr>';
+		
+		for(var c1 in count) {
+			var firstTotal = 0;
+			ret += '<tr><td><b>' + c1 + '</b></td>';
+			for (var c2i in fixedOrder2) {
+				var c2 = fixedOrder2[c2i];
+				var c1c2Count;
+				if(count[c1][c2]) {
+					c1c2Count = count[c1][c2];
+				} else {
+					c1c2Count = 0;
+				}
+				firstTotal += c1c2Count;
+				ret += '<td>' + (c1c2Count == 0 ? '' : c1c2Count) + '</td>';
+			}
+			ret += '<td class="rSum">' + firstTotal + '</td></tr>';
+		}
+		
+		ret += '<tr><td class="bSum"><b>总</b></td>';
+		
+		var totalCount = 0;
+		for (var c2i in fixedOrder2) {
+			var c2 = fixedOrder2[c2i];
+			totalCount += secondTotal[c2];
+			ret += ('<td class="bSum">' + secondTotal[c2] + '</td>');
+		}
+		ret += ('<td class="bSum rSum">' + totalCount + '</td></tr>');
+		
+		ret += '</table>';
+		$("bigramResults").innerHTML = ret;
+	}
+</SCRIPT>
+
+					<STYLE type=text/css>
+						.bigram TD {
+							BORDER-RIGHT: #eee 0px solid;
+							BORDER-TOP: #eee 1px solid;
+							BORDER-LEFT: #eee 1px solid;
+							BORDER-BOTTOM: #eee 0px solid
+						}
+
+						.bigram TD.bSum {
+							BORDER-TOP: #bbb 1px solid;
+							BORDER-BOTTOM: #eee 1px solid
+						}
+
+						.bigram TD.rSum {
+							BORDER-RIGHT: #eee 1px solid;
+							BORDER-LEFT: #bbb 1px solid
+						}
+
+						.bigram {
+							BORDER-RIGHT: #aaa 1px solid;
+							BORDER-TOP: #aaa 1px solid;
+							BORDER-LEFT: #aaa 1px solid;
+							BORDER-BOTTOM: #aaa 1px solid
+						}
+					</STYLE>
+					<A name=szmfwtj>
+						<P align=center>双字母分位统计
+							<P>
+							<TABLE>
+								<TBODY>
+									<TR vAlign=top>
+										<TD>
+											<FORM name=bigram><TEXTAREA id=input name=input rows=20
+													cols=50></TEXTAREA><BR><INPUT onclick="countBigram(); return false;"
+													type=submit value=统计 name=button>
+											</FORM>
+										</TD>
+										<TD width=60>
+											<DIV id=bigramResults style="PADDING-LEFT: 10px"></DIV>
+										</TD>
+									</TR>
+								</TBODY>
+							</TABLE>
+							<HR>
+							<A name=sgtd>
+								<FORM name=sub>
+									<TABLE width="100%" align=center>
+										<TBODY>
+											<TR>
+												<TD width=70>密文：</TD>
+												<TD><TEXTAREA style="FONT-FAMILY: courier" name=cipher rows=10 cols=75
+														onchange=updateSub();></TEXTAREA></TD>
+											</TR>
+											<TR>
+												<TD width=70>明文：</TD>
+												<TD><TEXTAREA style="FONT-FAMILY: courier" name=text rows=10
+														cols=75></TEXTAREA></TD>
+											</TR>
+											<TR>
+												<TD width=70>映射：</TD>
+												<TD>
+													<TABLE cols=5 width=500 rows="6">
+														<TBODY>
+															<TR>
+																<TD>A <INPUT onchange=updateSub(); size=2 name=A></TD>
+																<TD>B <INPUT onchange=updateSub(); size=2 name=B></TD>
+																<TD>C <INPUT onchange=updateSub(); size=2 name=C></TD>
+																<TD>D <INPUT onchange=updateSub(); size=2 name=D></TD>
+																<TD>E <INPUT onchange=updateSub(); size=2 name=E></TD>
+																<TD>F <INPUT onchange=updateSub(); size=2 name=F></TD>
+															</TR>
+															<TR>
+																<TD>G <INPUT onchange=updateSub(); size=2 name=G></TD>
+																<TD>H <INPUT onchange=updateSub(); size=2 name=H></TD>
+																<TD>I <INPUT onchange=updateSub(); size=2 name=I></TD>
+																<TD>J <INPUT onchange=updateSub(); size=2 name=J></TD>
+																<TD>K <INPUT onchange=updateSub(); size=2 name=K></TD>
+																<TD>L <INPUT onchange=updateSub(); size=2 name=L></TD>
+															</TR>
+															<TR>
+																<TD>M <INPUT onchange=updateSub(); size=2 name=M></TD>
+																<TD>N <INPUT onchange=updateSub(); size=2 name=N></TD>
+																<TD>O <INPUT onchange=updateSub(); size=2 name=O></TD>
+																<TD>P <INPUT onchange=updateSub(); size=2 name=P></TD>
+																<TD>Q <INPUT onchange=updateSub(); size=2 name=Q></TD>
+																<TD>R <INPUT onchange=updateSub(); size=2 name=R></TD>
+															</TR>
+															<TR>
+																<TD>S <INPUT onchange=updateSub(); size=2 name=S></TD>
+																<TD>T <INPUT onchange=updateSub(); size=2 name=T></TD>
+																<TD>U <INPUT onchange=updateSub(); size=2 name=U></TD>
+																<TD>V <INPUT onchange=updateSub(); size=2 name=V></TD>
+																<TD>W <INPUT onchange=updateSub(); size=2 name=W></TD>
+																<TD>X <INPUT onchange=updateSub(); size=2 name=X></TD>
+															</TR>
+															<TR>
+																<TD>Y <INPUT onchange=updateSub(); size=2 name=Y></TD>
+																<TD>Z <INPUT onchange=updateSub(); size=2 name=Z></TD>
+																<TD>0 <INPUT onchange=updateSub(); size=2 name=n0></TD>
+																<TD>1 <INPUT onchange=updateSub(); size=2 name=n1></TD>
+																<TD>2 <INPUT onchange=updateSub(); size=2 name=n2></TD>
+																<TD>3 <INPUT onchange=updateSub(); size=2 name=n3></TD>
+															</TR>
+															<TR <td>4 <INPUT onchange=updateSub(); size=2 name=n4>
+												</TD>
+												<TD>5 <INPUT onchange=updateSub(); size=2 name=n5></TD>
+												<TD>6 <INPUT onchange=updateSub(); size=2 name=n6></TD>
+												<TD>7 <INPUT onchange=updateSub(); size=2 name=n7></TD>
+												<TD>8 <INPUT onchange=updateSub(); size=2 name=n8></TD>
+												<TD>9 <INPUT onchange=updateSub(); size=2 name=n9></TD>
+											</TR>
+										</TBODY>
+									</TABLE><INPUT onclick=clearMappings() type=button value=清除对应>
+									<INPUT type=reset value=全部重设> </TD>
+									</TR>
+									<TR>
+										<TD width=70>码表：</TD>
+										<TD>
+											<DIV id=subMappings></DIV>
+										</TD>
+									</TR>
+									</TBODY>
+									</TABLE>
+								</FORM>
+								<HR>
+
+								<SCRIPT type=text/javascript>
+
+var vKey;
+
+var likely2 = ['th', 'he', 'an', 'in', 'er', 'on', 're', 'ed', 'nd', 'ha', 'at', 'en', 'es', 'of',
+		'nt', 'ea', 'ti', 'to', 'io', 'le', 'is', 'ou', 'ar', 'as', 'de', 'rt', 've', 'st',
+		'it', 'hi', 'ng', 'or', 'te', 'et', 'al', 'se', 'sa', 'si', 'ra', 'ld', 'ur', 'co',
+		'me', 'ch', 'om', 'el', 'be', 'li', 'ho', 'ta', 'ic', 'ce'];
+
+var usw_a1, usw_a2;
+
+function USW_sort(a, b) {
+	return a.score - b.score;
+}
+
+function USW_count(s) {
+	var l = s.length;
+	var count = 0.0;
+	for(var i = 0; i < l - 1; i++) {
+		var d = s.substring(i, i+2);
+		for(var j in likely2) {
+			if(likely2[j] == d) {
+				count += 1.0;
+				break;
+			}
+		}
+	}
+	return count;
+}
+
+function USW(name, s) {
+	this.name = name;
+	this.cipher = s;
+
+	var l = s.length;
+
+	this.score = Math.round(255 - 255.0 * USW_count(s) / (l - 1));
+	
+	if(vKey != "") {
+		this.vCipher = vigenereEncDec(vKey, s, false);
+		this.vScore = Math.round(255 - 255.0 * USW_count(this.vCipher) / (l - 1));
+	}
+}
+
+usw_caesar = function(cipher, prefix, a) {
+	for (var i = 1; i < 26; i++) {
+		var c = '';
+		for(var letter = 0; letter < cipher.length; letter++) {
+			c += ASCII2char((char2ASCII(cipher.charAt(letter)) - 97 + i) % 26 + 97);
+		}
+		a.push(new USW(prefix + '凯撒 ' + i, c));
+	}
+}
+
+usw_caesar2 = function(input) {
+	for (var i = 1; i < 26; i++) {
+		var text = '';
+		for(var letter = 0; letter < input.length; letter++) {
+			text += ASCII2char((char2ASCII(input.charAt(letter)) - 97 + i) % 26 + 97);
+		}
+		for (var k in commonSubMaps) {
+			var cipher = '';
+			for(var j = 0; j < text.length; j++) {
+				var c = text.charAt(j);
+				cipher += commonSubMaps[k].charAt(char2ASCII(c) - 97);
+			}
+			usw_a2.push(new USW('凯撒 ' + i + ' + ' + commonSubDefs[k], cipher));
+		}
+	}
+}
+
+usw_commonSub = function(text) {
+	for (var i in commonSubMaps) {
+		var cipher = '';
+		for(var j = 0; j < text.length; j++) {
+			var c = text.charAt(j);
+			cipher += commonSubMaps[i].charAt(char2ASCII(c) - 97);
+		}
+		usw_a1.push(new USW(commonSubDefs[i], cipher));
+	}
+}
+
+usw_caesarBox = function(cipher, prefix, a) {
+	var l = cipher.length;
+	for(var d = 2; d <= l / 2; d++) {
+		if(l % d == 0) {
+			var c = '';
+			for(var i = 0; i < d; i++) {
+				for(var j = i; j < l; j+= d) {
+					c += cipher.charAt(j);
+				}
+			}
+			a.push(new USW(prefix + '栅栏 ' + d, c));
+		}
+	}
+}
+
+usw_caesarBox2 = function(cipher) {
+	var l = cipher.length;
+	for(var d = 2; d <= l / 2; d++) {
+		if(l % d == 0) {
+			var c = '';
+			for(var i = 0; i < d; i++) {
+				for(var j = i; j < l; j+= d) {
+					c += cipher.charAt(j);
+				}
+			}
+			usw_caesar(c, '栅栏 ' + d + ' + ', usw_a2);
+		}
+	}
+}
+
+countUSW = function(cipher, letters) {
+	var newString = cipher;
+	for(var i = 0; i < letters.length; i++) {
+		newString = newString.replace(new RegExp(letters.charAt(i), "gi"), '');
+	}
+	return cipher.length - newString.length;
+}
+
+usw_commonSub2 = function(text) {
+	var a_text = atbash2text(text);
+	var r_text = strrev(text);
+	for (var i in commonSubMaps) {
+		var cipher = '';
+		var a_cipher = '';
+		var r_cipher = '';
+		for(var j = 0; j < text.length; j++) {
+			var c = text.charAt(j);
+			var a_c = a_text.charAt(j);
+			var r_c = r_text.charAt(j);
+			cipher += commonSubMaps[i].charAt(char2ASCII(c) - 97);
+			a_cipher += commonSubMaps[i].charAt(char2ASCII(a_c) - 97);
+			r_cipher += commonSubMaps[i].charAt(char2ASCII(r_c) - 97);
+		}
+		usw_caesar(cipher, commonSubDefs[i] + " + ", usw_a2);
+		usw_caesarBox(cipher, commonSubDefs[i] + " + ", usw_a2);
+		usw_a2.push(new USW("Atbash + " + commonSubDefs[i], atbash2text(cipher)));
+		usw_a2.push(new USW("倒序 + " + commonSubDefs[i], r_cipher));
+		usw_a2.push(new USW(commonSubDefs[i] + " + Atbash", a_cipher));
+	}
+}
+
+
+updateSingleWord = function() {
+	var cipher = $('singleword_cipher').value.toLowerCase().replace(/[^a-z]/g, '');
+	vKey = $('singleword_vKey').value;
+	countLetters = $("singleword_cLetters").value;
+	usw_a1 = [];
+
+	var r = '<table id="usw">';
+
+	r += "<tr><td colspan='2'><p align='center'>一层加密</p></td>";
+	if(vKey != "") {
+		r += '<td><center>维码解密</center></td>';
+	}
+	r += "</tr>";
+
+	usw_caesar(cipher, '', usw_a1);
+	usw_a1.push(new USW('Atbash', atbash2text(cipher)));
+	usw_a1.push(new USW('倒序', strrev(cipher)));
+	usw_commonSub(cipher);
+	usw_caesarBox(cipher, '', usw_a1);
+	
+	usw_a1.sort(USW_sort);
+
+	for(var i in usw_a1) {
+		r += '<tr style="background-color:rgb(' + usw_a1[i].score + ',255,' + usw_a1[i].score + ')">'
+			+ '<td>'+ usw_a1[i].name + '</td><td>' + usw_a1[i].cipher + '</td>';
+		if(vKey != "") {
+			r += '<td style="background-color:rgb(' + usw_a1[i].vScore + ',255,' + usw_a1[i].vScore + ')">' + usw_a1[i].vCipher + '</td>';
+		}
+		if(countLetters != "") {
+			r += '<td>' + countUSW(usw_a1[i].cipher, countLetters) + '</td>';
+		}
+		r += '</tr>';
+	}
+
+	if($("sw2").checked) {
+		usw_a2 = [];
+		r += "<tr><td colspan='2'><p align='center'>两层加密</p></td></tr>";
+		var a_text = atbash2text(cipher);
+		usw_caesar(a_text, 'Atbash + ', usw_a2);
+		usw_caesarBox(a_text, 'Atbash + ', usw_a2);
+		usw_a2.push(new USW('倒序 + Atbash', strrev(a_text)));
+		var r_text = strrev(cipher);
+		usw_caesar(r_text, '倒序 + ', usw_a2);
+		usw_caesarBox(r_text, '倒序 + ', usw_a2);
+		usw_caesar2(cipher);
+		usw_caesarBox2(cipher);
+		usw_commonSub2(cipher);
+
+		usw_a2.sort(USW_sort);
+		for(var i in usw_a2) {
+			r += '<tr style="background-color:rgb(' + usw_a2[i].score + ',255,' + usw_a2[i].score + ')">'
+				+ '<td>'+ usw_a2[i].name + '</td><td>' + usw_a2[i].cipher + '</td>';
+			if(vKey != "") {
+				r += '<td style="background-color:rgb(' + usw_a2[i].vScore + ',255,' + usw_a2[i].vScore + ')">' + usw_a2[i].vCipher + '</td>';
+			}
+			if(countLetters != "") {
+				r += '<td>' + countUSW(usw_a2[i].cipher, countLetters) + '</td>';
+			}
+			r += '</tr>';
+		}
+	}
+
+	r += '</table>';
+
+	$('singleword_result').innerHTML = r;
+}
+</SCRIPT>
+								<A name=singleword>
+									<P align=center>一个词的暴力……
+										<P>
+											<CENTER>
+												<TABLE>
+													<TBODY>
+														<TR>
+															<TD style="PADDING-RIGHT: 50px"><B>替代类：</B></TD>
+															<TD>凯撒，Atbash, QWE</TD>
+														</TR>
+														<TR>
+															<TD style="PADDING-RIGHT: 50px"><B>移动类：</B></TD>
+															<TD>栅栏，倒序</TD>
+														</TR>
+														<TR>
+															<TD colSpan=2>
+																其中可调换顺序的有：凯撒&lt;&gt;Atbash，替代&lt;&gt;移动，栅栏&lt;&gt;倒序。
+															</TD>
+														</TR>
+													</TBODY>
+												</TABLE>
+											</CENTER>
+										<P>密文：<INPUT id=singleword_cipher onchange=updateSingleWord() size=50>
+											<INPUT id=sw2 onclick=updateSingleWord() type=checkbox> 两层
+											<BR>维码密钥（可选）：<INPUT id=singleword_vKey onchange=updateSingleWord() size=50>
+											<BR>计数字母（可选）：<INPUT id=singleword_cLetters onchange=updateSingleWord()
+												size=50>
+										</P>
+										<DIV id=singleword_result></DIV>
+										<HR>
+										<A name=cjhzbmdz>
+											<P align=center>常见汉字编码对照
+												<P>
+												<TABLE>
+													<TBODY>
+														<TR>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=50><B>汉字</B>
+															</TD>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=50>
+																<B>电报码</B></TD>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=50>
+																<B>区位码</B></TD>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=100>
+																<B>GBK码</B></TD>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=60>
+																<B>Unicode</B></TD>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=50><B>四角</B>
+															</TD>
+															<TD style="BORDER-BOTTOM: #888 1px solid" width=50>
+																<B>五笔编码</B></TD>
+														</TR>
+														<TR>
+															<TD>的</TD>
+															<TD>4104</TD>
+															<TD>2136</TD>
+															<TD>B5C4 (46532)</TD>
+															<TD>30340</TD>
+															<TD>27620</TD>
+															<TD>RQYY</TD>
+														</TR>
+														<TR>
+															<TD>一</TD>
+															<TD>0001</TD>
+															<TD>5027</TD>
+															<TD>D2BB (53947)</TD>
+															<TD>19968</TD>
+															<TD>10000</TD>
+															<TD>GGLL</TD>
+														</TR>
+														<TR>
+															<TD>了</TD>
+															<TD>0055</TD>
+															<TD>3343</TD>
+															<TD>C1CB (49611)</TD>
+															<TD>20102</TD>
+															<TD>17207</TD>
+															<TD>BNH</TD>
+														</TR>
+														<TR>
+															<TD>是</TD>
+															<TD>2508</TD>
+															<TD>4239</TD>
+															<TD>CAC7 (51911)</TD>
+															<TD>26159</TD>
+															<TD>60801</TD>
+															<TD>JGHU</TD>
+														</TR>
+														<TR>
+															<TD>我</TD>
+															<TD>2053</TD>
+															<TD>4650</TD>
+															<TD>CED2 (52946)</TD>
+															<TD>25105</TD>
+															<TD>23550</TD>
+															<TD>TRNT/TRNY</TD>
+														</TR>
+														<TR>
+															<TD>不</TD>
+															<TD>0008</TD>
+															<TD>1827</TD>
+															<TD>B2BB (45755)</TD>
+															<TD>19981</TD>
+															<TD>10900</TD>
+															<TD>GII/DHI</TD>
+														</TR>
+														<TR>
+															<TD>在</TD>
+															<TD>0961</TD>
+															<TD>5258</TD>
+															<TD>D4DA (54490)</TD>
+															<TD>22312</TD>
+															<TD>40214</TD>
+															<TD>DHFD</TD>
+														</TR>
+														<TR>
+															<TD>人</TD>
+															<TD>0086</TD>
+															<TD>4043</TD>
+															<TD>C8CB (51403)</TD>
+															<TD>20154</TD>
+															<TD>80000</TD>
+															<TD>WWWW</TD>
+														</TR>
+														<TR>
+															<TD>们</TD>
+															<TD>0226</TD>
+															<TD>3539</TD>
+															<TD>C3C7 (50119)</TD>
+															<TD>20204</TD>
+															<TD>27220</TD>
+															<TD>WUN</TD>
+														</TR>
+														<TR>
+															<TD>有</TD>
+															<TD>2589</TD>
+															<TD>5148</TD>
+															<TD>D3D0 (54224)</TD>
+															<TD>26377</TD>
+															<TD>40227</TD>
+															<TD>DEF</TD>
+														</TR>
+														<TR>
+															<TD>你</TD>
+															<TD>0132</TD>
+															<TD>3667</TD>
+															<TD>C4E3 (50403)</TD>
+															<TD>20320</TD>
+															<TD>27292</TD>
+															<TD>WQIY</TD>
+														</TR>
+														<TR>
+															<TD>爱</TD>
+															<TD>1947</TD>
+															<TD>1614</TD>
+															<TD>B0AE (45230)</TD>
+															<TD>29233</TD>
+															<TD>20407</TD>
+															<TD>EPDC</TD>
+														</TR>
+													</TBODY>
+												</TABLE>
+											</P>
+										</A></TD>
+										</TR>
+										</TBODY>
+										</TABLE>
+										<DIV id=fixedMenu><A
+												href="http://welkin.byethost3.com/puzzle.html#zy">资源整理</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#sz">数字转换</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#ywzm">英文字母转换</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#ks">凯撒移位</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#cjtd">QWE</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#mw">盲文</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#polybius">Polybius</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#wjny">维吉尼亚</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#auto">Autokey暴力破译</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#zspl">字数频率</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#szmfwtj">双字母分位统计</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#sgtd">手工替代</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#singleword">一个词的暴力……</A><BR><A
+												href="http://welkin.byethost3.com/puzzle.html#cjhzbmdz">常见汉字编码对照</A><BR><BR><A
+												href="http://welkin.byethost3.com/index.html">Index</A> </DIV>
+</BODY>
+
+</HTML>

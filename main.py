@@ -442,5 +442,96 @@ class MyPlugin(Star):
                     result += "?"
             yield event.plain_result(f"解码结果: \n{result.lower()}")
 
-        async def terminate(self):
-            """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
+    async def caesar(self, string: str, shift: int):
+        """凯撒密码加密"""
+        result = ""
+        for char in string:
+            if char.isalpha():
+                shift_base = ord("A") if char.isupper() else ord("a")
+                result += chr((ord(char) - shift_base + shift) % 26 + shift_base)
+            else:
+                result += char
+        return result
+
+    async def atbash(self, string: str):
+        """阿特巴什密码加密"""
+        result = ""
+        for char in string:
+            if char.isalpha():
+                shift_base = ord("A") if char.isupper() else ord("a")
+                result += chr(25 - (ord(char) - shift_base) + shift_base)
+            else:
+                result += char
+        return result
+
+    async def qwe_encode(self, string: str):
+        """QWE密码加密"""
+        result = ""
+        dic_upper = "QWERTYUIOPASDFGHJKLZXCVBNM"
+        dic_lower = "qwertyuiopasdfghjklzxcvbnm"
+        for char in string:
+            if char.isalpha():
+                if char.isupper():
+                    result += dic_upper[ord(char) - ord("A")]
+                else:
+                    result += dic_lower[ord(char) - ord("a")]
+            else:
+                result += char
+        return result
+
+    async def qwe_decode(self, string: str):
+        """QWE密码解密"""
+        result = ""
+        dic_upper = "QWERTYUIOPASDFGHJKLZXCVBNM"
+        dic_lower = "qwertyuiopasdfghjklzxcvbnm"
+        for char in string:
+            if char.isalpha():
+                if char.isupper():
+                    result += chr(dic_upper.index(char) + ord("A"))
+                else:
+                    result += chr(dic_lower.index(char) + ord("a"))
+            else:
+                result += char
+        return result
+
+    @filter.command("caesar", alias={"ks"})
+    async def caesar_command(self, event: AstrMessageEvent):
+        """凯撒密码命令"""
+        message_str = event.message_str  # 用户发的纯文本消息字符串
+        message_chain = event.get_messages()
+        logger.info(message_chain)
+        messages = message_str.split()
+        if len(messages) < 3:
+            yield event.plain_result("请输入待加密文本和位移量！")
+        else:
+            text = messages[1].strip()
+            try:
+                shift = int(messages[2].strip())
+            except ValueError:
+                yield event.plain_result("位移量必须是一个整数！")
+                return
+
+            result = await self.caesar(text, shift)
+            yield event.plain_result(f"凯撒位移结果: \n{result}")
+
+    @filter.command("bomb")
+    async def bomb_command(self, event: AstrMessageEvent):
+        """爆破，爽"""
+        message_str = event.message_str  # 用户发的纯文本消息字符串
+        message_chain = event.get_messages()
+        logger.info(message_chain)
+        messages = message_str.split()
+        if len(messages) < 2:
+            yield event.plain_result("请输入待爆破的文本！")
+        else:
+            text = " ".join(messages[1:])
+            result = "爆破结果：\n"
+            for i in range(1, 26):
+                result += f"凯撒+{i}: {await self.caesar(text, i)}\n"
+            result += f"Atbash: {await self.atbash(text)}\n"
+            result += f"QWE加密: {await self.qwe_encode(text)}\n"
+            result += f"QWE解密: {await self.qwe_decode(text)}\n"
+            yield event.plain_result(result)
+
+    async def terminate(self):
+        """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
