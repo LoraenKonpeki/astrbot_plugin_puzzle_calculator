@@ -370,5 +370,77 @@ class MyPlugin(Star):
                     result += "?"
             yield event.plain_result(f"解码结果: \n{result.lower()}")
 
+    @filter.command("morsehelp", alias={"mshelp"})
+    async def morse_help(self, event: AstrMessageEvent):
+        """摩尔斯电码帮助"""
+        help_text = """
+        摩尔斯电码帮助：
+        /morse <摩尔斯电码> 或 /ms <摩尔斯电码>，电码之间用空格分隔
+        示例：/ms .- -... -.-.
+                     
+        横线可以用以下字符：- _ — 一
+        点可以用以下字符：. 、 · *
+        例如：/morse *一 —、、、 _·_·
+                     """
+        yield event.plain_result(help_text)
+
+    @filter.command("morse", alias={"ms"})
+    async def morse_decode(self, event: AstrMessageEvent):
+        """摩尔斯电码解码"""
+        message_str = event.message_str  # 用户发的纯文本消息字符串
+        message_chain = event.get_messages()
+        logger.info(message_chain)
+        morse_code = message_str.strip().split()[1:]
+        if morse_code == []:
+            yield event.plain_result("请输入待解码摩尔斯电码！")
+        else:
+            dic_morse = {
+                ".-": "A",
+                "-...": "B",
+                "-.-.": "C",
+                "-..": "D",
+                ".": "E",
+                "..-.": "F",
+                "--.": "G",
+                "....": "H",
+                "..": "I",
+                ".---": "J",
+                "-.-": "K",
+                ".-..": "L",
+                "--": "M",
+                "-.": "N",
+                "---": "O",
+                ".--.": "P",
+                "--.-": "Q",
+                ".-.": "R",
+                "...": "S",
+                "-": "T",
+                "..-": "U",
+                "...-": "V",
+                ".--": "W",
+                "-..-": "X",
+                "-.--": "Y",
+                "--..": "Z",
+                "-----": "0",
+                ".----": "1",
+                "..---": "2",
+                "...--": "3",
+                "....-": "4",
+                ".....": "5",
+                "-....": "6",
+                "--...": "7",
+                "---..": "8",
+                "----.": "9",
+            }
+
+            result = ""
+            for code in morse_code:
+                code = code.translate(str.maketrans("_—一、·*", "---..."))
+                if code in dic_morse:
+                    result += dic_morse[code]
+                else:
+                    result += "?"
+            yield event.plain_result(f"解码结果: \n{result.lower()}")
+
         async def terminate(self):
             """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
