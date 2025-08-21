@@ -42,7 +42,7 @@ class MyPlugin(Star):
         message_chain = event.get_messages()
         logger.info(message_chain)
         message_str = message_str.strip().split()
-
+        flags = []  # 用于存储旗语
         flags_strs = message_str[1:]  # 获取除指令外的所有内容
         for flags_str in flags_strs:
             flags += [flags_str[i : i + 2] for i in range(0, len(flags_str), 2)]
@@ -281,7 +281,7 @@ class MyPlugin(Star):
                 "ASXZ": "=",
                 "AXZ": "?",
             }
-            if "k" in message_str[0].lower():  # 检测是否使用手机键盘盲文
+            if "k" in message_str.split()[0].lower():  # 检测是否使用手机键盘盲文
                 dic_blind = {
                     "1": "A",
                     "14": "B",
